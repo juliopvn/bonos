@@ -63,3 +63,13 @@ npm run dev
 ```
 
 4. Magic links visibles en [http://localhost:8025](http://localhost:8025).
+
+<!-- BEGIN cc:que-se-valora -->
+¡Hola! Para que tengas claro qué vamos a mirar cuando corrijamos tu proyecto de Bonos, te he preparado esta sección. Así sabes dónde poner el foco.
+
+## 📋 Qué se valora
+
+Cuando revisemos tu proyecto, **lo que más pesa** es que todo funcione como se espera y que hayas cumplido con cada punto del enunciado. También es **importante** que tu código esté bien estructurado y sea de calidad, y que el vídeo demo muestre claramente lo que has hecho. Por último, aunque con un **peso menor**, valoraremos cómo has documentado tus decisiones y el proceso.
+
+Recuerda que el enunciado del proyecto es la guía principal, y la evaluación no te penalizará por cosas que no se pidan explícitamente en él.
+<!-- END cc:que-se-valora -->
