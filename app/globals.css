@@ -1,0 +1,372 @@
+@import 'tailwindcss';
+
+/*
+ * Sistema visual: "título valor".
+ * Papel verdoso, tinta verde-negra, dorado de orla (cupón) y bermellón de sello.
+ * La firma del diseño es el cupón desprendible con perforación y la orla guilloché.
+ */
+@theme inline {
+  --color-ink: #0d2b2c;
+  --color-ink-soft: #4a6261;
+  --color-paper: #e9ede7;
+  --color-sheet: #f7f8f4;
+  --color-line: #cbd3c9;
+  --color-verdigris: #1d5c58;
+  --color-verdigris-deep: #0f3d3b;
+  --color-gilt: #a97a27;
+  --color-gilt-soft: #eadbb6;
+  --color-vermilion: #b23a2b;
+  --color-moss: #2f7a4a;
+
+  --font-display: var(--font-gloock), 'Times New Roman', serif;
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-paper);
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgb(169 122 39 / 0.08), transparent 60%),
+    var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gilt);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Tipografía ─────────────────────────────── */
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-verdigris);
+}
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.muted {
+  color: var(--color-ink-soft);
+}
+
+/* ── Superficies ────────────────────────────── */
+.card {
+  background: var(--color-sheet);
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+}
+.card-pad {
+  padding: 20px;
+}
+.rule-double {
+  border-bottom: 3px double var(--color-gilt);
+}
+
+/* Título valor: marco doble con esquinas */
+.certificate {
+  position: relative;
+  background: var(--color-sheet);
+  border: 1px solid var(--color-verdigris-deep);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 5px var(--color-sheet),
+    inset 0 0 0 6px var(--color-gilt);
+  overflow: hidden;
+}
+
+/* Cupón desprendible: talón + perforación con muescas */
+.coupon {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  background: var(--color-sheet);
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+}
+.coupon .stub {
+  position: relative;
+  padding: 14px 18px 14px 22px;
+  border-left: 2px dashed var(--color-gilt);
+  min-width: 120px;
+  text-align: right;
+  background: linear-gradient(90deg, rgb(169 122 39 / 0.07), transparent);
+}
+.coupon .stub::before,
+.coupon .stub::after {
+  content: '';
+  position: absolute;
+  left: -9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+}
+.coupon .stub::before {
+  top: -9px;
+  clip-path: inset(50% 0 0 0);
+}
+.coupon .stub::after {
+  bottom: -9px;
+  clip-path: inset(0 0 50% 0);
+}
+
+/* ── Controles ──────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--color-verdigris);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-verdigris-deep);
+}
+.btn-gilt {
+  background: var(--color-gilt);
+  color: #fff;
+}
+.btn-gilt:hover:not(:disabled) {
+  background: #8f6620;
+}
+.btn-ghost {
+  background: transparent;
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgb(13 43 44 / 0.06);
+}
+.btn-danger {
+  background: transparent;
+  border-color: var(--color-vermilion);
+  color: var(--color-vermilion);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgb(178 58 43 / 0.08);
+}
+.btn-sm {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-soft);
+}
+.input {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  color: var(--color-ink);
+  font: inherit;
+}
+.input:focus {
+  outline: 2px solid var(--color-verdigris);
+  outline-offset: 0;
+  border-color: var(--color-verdigris);
+}
+.hint {
+  font-size: 12px;
+  color: var(--color-ink-soft);
+}
+.field-error {
+  font-size: 12px;
+  color: var(--color-vermilion);
+}
+
+/* ── Tablas ─────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-ink);
+  white-space: nowrap;
+}
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-line);
+  vertical-align: middle;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table .r {
+  text-align: right;
+}
+
+/* ── Etiquetas ──────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+.badge-ok {
+  color: var(--color-moss);
+}
+.badge-warn {
+  color: var(--color-gilt);
+}
+.badge-bad {
+  color: var(--color-vermilion);
+}
+.badge-info {
+  color: var(--color-verdigris);
+}
+.badge-mute {
+  color: var(--color-ink-soft);
+}
+
+.pos {
+  color: var(--color-moss);
+}
+.neg {
+  color: var(--color-vermilion);
+}
+
+/* ── Navegación ─────────────────────────────── */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 3px;
+  color: #cfe0dc;
+  font-weight: 500;
+  font-size: 14px;
+  border-left: 2px solid transparent;
+}
+.nav-link:hover {
+  background: rgb(255 255 255 / 0.06);
+  color: #fff;
+}
+.nav-link[aria-current='page'] {
+  color: #fff;
+  background: rgb(255 255 255 / 0.09);
+  border-left-color: var(--color-gilt);
+}
+
+/* ── Animación de entrada, una sola vez ──────── */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.45s ease-out both;
+}
+.rise-2 {
+  animation: rise 0.45s 0.08s ease-out both;
+}
+.rise-3 {
+  animation: rise 0.45s 0.16s ease-out both;
+}
+
+@keyframes pulse-dot {
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--color-moss);
+  animation: pulse-dot 1.6s infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e1e6df, #eef1eb, #e1e6df);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 3px;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.table td.num {
+  white-space: nowrap;
+}

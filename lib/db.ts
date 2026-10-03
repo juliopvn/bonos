@@ -1,8 +1,8 @@
-import { MongoClient, type Collection, type Db, type Document } from 'mongodb';
+import { MongoClient, type Collection, type Db } from 'mongodb';
 import { getEnv } from './env';
 import type * as T from './types';
 
-interface Collections {
+type Collections = {
   users: T.UserDoc;
   magicLinks: T.MagicLinkDoc;
   issuers: T.IssuerDoc;
@@ -48,9 +48,9 @@ export async function getDb(): Promise<Db> {
   return db;
 }
 
-export async function col<K extends keyof Collections>(name: K): Promise<Collection<Collections[K] & Document>> {
+export async function col<K extends keyof Collections>(name: K): Promise<Collection<Collections[K]>> {
   const db = await getDb();
-  return db.collection<Collections[K] & Document>(name);
+  return db.collection<Collections[K]>(name);
 }
 
 /** Crea los índices de forma idempotente. */
@@ -71,6 +71,9 @@ export async function ensureIndexes(db: Db): Promise<void> {
     db.collection('scheduledPayments').createIndex({ status: 1, dueDate: 1 }),
     db.collection('scheduledPayments').createIndex({ investorId: 1, status: 1, dueDate: 1 }),
     db.collection('scheduledPayments').createIndex({ bondId: 1 }),
+    db
+      .collection('scheduledPayments')
+      .createIndex({ bondId: 1, investorId: 1, type: 1, dueDate: 1 }, { unique: true }),
     db.collection('documents').createIndex({ bondId: 1, createdAt: -1 }),
     db.collection('covenants').createIndex({ bondId: 1 }),
     db.collection('alerts').createIndex({ investorId: 1, createdAt: -1 }),

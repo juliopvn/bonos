@@ -57,7 +57,7 @@ const schema = z
     SEED_PROFILE: z.enum(['dev', 'e2e', 'demo']).default('dev'),
     ALLOW_SEED: bool('false'),
 
-    BASE_URL: optional(z.url()),
+    BASE_URL: optional(z.string()), // solo E2E/smoke
     E2E_MODE: bool('false'),
     E2E_MAILBOX: z.enum(['mailhog', 'memory']).default('mailhog'),
     E2E_MONGO: z.enum(['external', 'memory']).default('external'),

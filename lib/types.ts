@@ -12,13 +12,13 @@ export type PaymentStatus = 'scheduled' | 'paid';
 export type DocumentKind = 'fiscal' | 'use_of_funds' | 'covenant' | 'report';
 export type AlertType = 'rating_change' | 'price_move' | 'rebalance' | 'payment';
 
-export interface AlertPrefs {
+export type AlertPrefs = {
   priceMoveBps: number;
   concentrationPct: number;
   email: boolean;
 }
 
-export interface UserDoc {
+export type UserDoc = {
   _id: ObjectId;
   email: string;
   name: string;
@@ -27,7 +27,7 @@ export interface UserDoc {
   alertPrefs: AlertPrefs;
 }
 
-export interface MagicLinkDoc {
+export type MagicLinkDoc = {
   _id: ObjectId;
   jti: string;
   email: string;
@@ -35,13 +35,13 @@ export interface MagicLinkDoc {
   usedAt: Date | null;
 }
 
-export interface RatingEntry {
+export type RatingEntry = {
   rating: string;
   date: Date;
   agency: string;
 }
 
-export interface IssuerDoc {
+export type IssuerDoc = {
   _id: ObjectId;
   name: string;
   sector: string;
@@ -51,7 +51,7 @@ export interface IssuerDoc {
   createdAt: Date;
 }
 
-export interface BondDoc {
+export type BondDoc = {
   _id: ObjectId;
   issuerId: ObjectId;
   name: string;
@@ -76,7 +76,7 @@ export interface BondDoc {
   createdAt: Date;
 }
 
-export interface PriceHistoryDoc {
+export type PriceHistoryDoc = {
   _id: ObjectId;
   bondId: ObjectId;
   date: Date;
@@ -84,7 +84,7 @@ export interface PriceHistoryDoc {
   ytmBps: number;
 }
 
-export interface OrderDoc {
+export type OrderDoc = {
   _id: ObjectId;
   bondId: ObjectId;
   investorId: ObjectId;
@@ -95,7 +95,7 @@ export interface OrderDoc {
   createdAt: Date;
 }
 
-export interface PositionDoc {
+export type PositionDoc = {
   _id: ObjectId;
   investorId: ObjectId;
   bondId: ObjectId;
@@ -104,7 +104,7 @@ export interface PositionDoc {
   acquiredAt: Date;
 }
 
-export interface ScheduledPaymentDoc {
+export type ScheduledPaymentDoc = {
   _id: ObjectId;
   bondId: ObjectId;
   investorId: ObjectId;
@@ -115,7 +115,7 @@ export interface ScheduledPaymentDoc {
   paidAt: Date | null;
 }
 
-export interface DocumentDoc {
+export type DocumentDoc = {
   _id: ObjectId;
   bondId: ObjectId | null;
   issuerId: ObjectId | null;
@@ -128,7 +128,7 @@ export interface DocumentDoc {
   createdAt: Date;
 }
 
-export interface CovenantDoc {
+export type CovenantDoc = {
   _id: ObjectId;
   bondId: ObjectId;
   description: string;
@@ -138,7 +138,7 @@ export interface CovenantDoc {
   lastCheckedAt: Date;
 }
 
-export interface AlertDoc {
+export type AlertDoc = {
   _id: ObjectId;
   investorId: ObjectId;
   type: AlertType;
@@ -149,7 +149,7 @@ export interface AlertDoc {
   createdAt: Date;
 }
 
-export interface AuditLogDoc {
+export type AuditLogDoc = {
   _id: ObjectId;
   actorId: ObjectId | null;
   action: string;
@@ -159,7 +159,7 @@ export interface AuditLogDoc {
   createdAt: Date;
 }
 
-export interface TestMailDoc {
+export type TestMailDoc = {
   _id: ObjectId;
   to: string;
   subject: string;
@@ -168,14 +168,14 @@ export interface TestMailDoc {
   createdAt: Date;
 }
 
-export interface RateLimitDoc {
+export type RateLimitDoc = {
   _id: ObjectId;
   key: string;
   count: number;
   expiresAt: Date;
 }
 
-export interface JobStateDoc {
+export type JobStateDoc = {
   _id: ObjectId;
   key: string;
   value: unknown;
