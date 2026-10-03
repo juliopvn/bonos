@@ -9,7 +9,7 @@ default:
   tags: [cloudrun]
   interruptible: true
 
-stages: [diagnose, quality]
+stages: [diagnose, quality, test]
 
 variables:
   GIT_DEPTH: "20"
@@ -38,6 +38,25 @@ quality:
   script:
     - pnpm lint
     - pnpm typecheck
+
+# ── Etapa 2: unit + integración (Mongo en memoria: el runner no tiene Docker) ──
+test:
+  extends: .node
+  stage: test
+  variables:
+    INTEGRATION_MONGO: memory
+  script:
+    - pnpm exec vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-results/junit.xml
+  coverage: '/All files\s*\|\s*([\d.]+)/'
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [coverage/]
+    reports:
+      junit: test-results/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
 
 # ── Diagnóstico del runner (manual) ────────────────────────────
 diagnose:
