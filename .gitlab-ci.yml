@@ -9,7 +9,7 @@ default:
   tags: [cloudrun]
   interruptible: true
 
-stages: [diagnose, quality, test, build]
+stages: [diagnose, quality, test, build, e2e]
 
 variables:
   GIT_DEPTH: "20"
@@ -25,6 +25,7 @@ variables:
     paths:
       - .pnpm-store
       - .cache/mongodb-binaries
+      - .cache/ms-playwright
   before_script:
     - node -v
     - npm install -g pnpm@12.8.1
@@ -64,6 +65,25 @@ build:
   stage: build
   script:
     - pnpm build
+
+# ── Etapa 4: E2E sin contenedores (mongodb-memory-server + mail memory + storage fs) ──
+# Arranca con un solo test smoke (login por magic link); la suite completa se habilita tras verlo en verde.
+e2e:
+  extends: .node
+  stage: e2e
+  variables:
+    E2E_MAILBOX: memory
+    E2E_MONGO: memory
+    PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
+  script:
+    - pnpm exec playwright install --with-deps chromium
+    - pnpm exec playwright test --project=chromium e2e/auth.spec.ts -g "admin entra"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [playwright-report/, test-results/]
+    reports:
+      junit: test-results/e2e-junit.xml
 
 # ── Diagnóstico del runner (manual) ────────────────────────────
 diagnose:
