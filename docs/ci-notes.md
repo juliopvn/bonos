@@ -31,3 +31,10 @@ Sin Docker ni `services:` pero con internet → **modo sin contenedores**: `mong
 - Hipótesis: el único runner online exige tag (`run_untagged=false`, tag `cloudrun`)
 - Cambio aplicado: `default: tags: [cloudrun]`
 - Resultado: jobs ejecutados; ver tabla de arriba. Fallo de **infraestructura** (no de código)
+
+### Intento 3 — 2026-10-03
+- Job / stage: `quality` (con el cache de Playwright restaurado desde el job `e2e` previo)
+- Error observado: `eslint` analizó `.cache/ms-playwright/.../main.js` → 1 error `no-this-alias`
+- Hipótesis: fallo **de código/config** (ESLint no ignoraba directorios de caché del CI)
+- Cambio aplicado: `.cache/**` y `.pnpm-store/**` en `globalIgnores` (y en `.gitignore`/`.prettierignore`)
+- Resultado: ver siguiente intento
