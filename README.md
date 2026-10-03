@@ -73,3 +73,12 @@ Cuando revisemos tu proyecto, **lo que más pesa** es que todo funcione como se 
 
 Recuerda que el enunciado del proyecto es la guía principal, y la evaluación no te penalizará por cosas que no se pidan explícitamente en él.
 <!-- END cc:que-se-valora -->
+
+## 🌐 Despliegue
+
+- **URL pública:** [https://bonos.jpavon-tech.com](https://bonos.jpavon-tech.com)
+- **Usuarios demo:** `admin@demo.local` (administrador) e `investor1@demo.local` … `investor4@demo.local` (inversores). En la pantalla de acceso escribe el correo y recibirás un **magic link** (enlace de un solo uso, 15 min) por Resend.
+- **Stack de producción:** Next.js 16 en Vercel · MongoDB Atlas · Cloudflare R2 (documentos) y DNS · Resend (correo) · Vercel Cron (pagos y alertas diarios).
+- **Pipeline:** ![pipeline](https://gitlab.codecrypto.academy/julio.pavon60/1.3.190-bonos/badges/main/pipeline.svg)
+- **Flujo:** GitLab (origen + CI) → mirror manual a GitHub → Vercel despliega. Solo se empuja al espejo con el pipeline en verde.
+- Guía completa: [docs/deploy.md](docs/deploy.md)

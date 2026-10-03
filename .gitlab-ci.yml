@@ -1,0 +1,35 @@
+# Paso 1 (diagnóstico): solo informa sobre el runner real. Ver docs/ci-notes.md.
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+stages: [diagnose]
+
+diagnose:
+  stage: diagnose
+  image: node:24-bookworm
+  interruptible: true
+  script:
+    - echo "== runner"; echo "desc=$CI_RUNNER_DESCRIPTION tags=$CI_RUNNER_TAGS arch=$CI_RUNNER_EXECUTABLE_ARCH server=$CI_SERVER_VERSION"
+    - uname -a || true
+    - cat /etc/os-release || true
+    - echo "== recursos"; nproc || true; free -m || cat /proc/meminfo | head -3 || true; df -h || true; df -h /dev/shm || true
+    - echo "== herramientas"; node -v || true; (corepack --version || true); (pnpm -v || true); git --version || true
+    - (docker version || echo "docker: no disponible"); (docker info 2>&1 | head -5 || true)
+    - echo "== red"
+    - for u in https://registry.npmjs.org https://fastdl.mongodb.org https://cdn.playwright.dev https://playwright.azureedge.net https://mcr.microsoft.com https://registry-1.docker.io; do printf "%s -> " "$u"; curl -sSI --max-time 10 "$u" | head -1 || echo FALLO; done
+    - env | grep -i proxy || echo "sin proxy"
+  allow_failure: false
+
+diagnose:services:
+  stage: diagnose
+  image: node:24-bookworm
+  interruptible: true
+  services:
+    - name: mongo:7
+      alias: mongo
+      command: ["--replSet", "rs0", "--bind_ip_all"]
+  script:
+    - echo "Probando conexión a mongo:27017 (puede fallar; es información)"
+    - node -e "const net=require('net');const s=net.connect(27017,'mongo');s.on('connect',()=>{console.log('mongo: puerto abierto');process.exit(0)});s.on('error',e=>{console.log('mongo: FALLO',e.message);process.exit(1)});setTimeout(()=>{console.log('timeout');process.exit(1)},20000)"
+  allow_failure: true
