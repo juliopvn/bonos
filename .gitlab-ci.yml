@@ -9,7 +9,7 @@ default:
   tags: [cloudrun]
   interruptible: true
 
-stages: [diagnose, quality, test]
+stages: [diagnose, quality, test, build]
 
 variables:
   GIT_DEPTH: "20"
@@ -57,6 +57,13 @@ test:
       coverage_report:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
+
+# ── Etapa 3: build de producción ──
+build:
+  extends: .node
+  stage: build
+  script:
+    - pnpm build
 
 # ── Diagnóstico del runner (manual) ────────────────────────────
 diagnose:
