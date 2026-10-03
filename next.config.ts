@@ -27,6 +27,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // El E2E compila en un directorio aparte para no pisar un `pnpm dev` en marcha.
+  distDir: process.env.NEXT_DIST_DIR ?? '.next',
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

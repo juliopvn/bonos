@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=chromium --project=mobile",
     "test:smoke": "playwright test --project=smoke",
     "seed": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed.ts",
     "seed:reset": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed.ts --reset",
