@@ -9,7 +9,7 @@ default:
   tags: [cloudrun]
   interruptible: true
 
-stages: [diagnose, quality, test, build, e2e]
+stages: [diagnose, quality, test, build, e2e, smoke]
 
 variables:
   GIT_DEPTH: "20"
@@ -67,7 +67,7 @@ build:
     - pnpm build
 
 # ── Etapa 4: E2E sin contenedores (mongodb-memory-server + mail memory + storage fs) ──
-# Arranca con un solo test smoke (login por magic link); la suite completa se habilita tras verlo en verde.
+# Ya validado el smoke de login, corre la suite completa (chromium + mobile).
 e2e:
   extends: .node
   stage: e2e
@@ -77,13 +77,30 @@ e2e:
     PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
   script:
     - pnpm exec playwright install --with-deps chromium
-    - pnpm exec playwright test --project=chromium e2e/auth.spec.ts -g "admin entra"
+    - pnpm test:e2e
   artifacts:
     when: always
     expire_in: 1 week
     paths: [playwright-report/, test-results/]
     reports:
       junit: test-results/e2e-junit.xml
+
+# ── Smoke contra producción (manual, tras cada deploy en Vercel) ──
+smoke:production:
+  extends: .node
+  stage: smoke
+  when: manual
+  allow_failure: true
+  variables:
+    BASE_URL: "https://bonos.jpavon-tech.com"
+    PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
+  script:
+    - pnpm exec playwright install --with-deps chromium
+    - pnpm test:smoke
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [playwright-report/, test-results/]
 
 # ── Diagnóstico del runner (manual) ────────────────────────────
 diagnose:
