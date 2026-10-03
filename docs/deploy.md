@@ -99,4 +99,4 @@ Notas:
 
 ## Runner de CI y resumen de iteraciones
 
-Ver `docs/ci-notes.md` (se actualiza con la configuración final que funcionó).
+Resumen (detalle y bitácora en `docs/ci-notes.md`): runner `cloudrun-ephemeral` con tag obligatorio `cloudrun`, sin Docker ni `services:`, Node 22 (ignora `image:`). Pipeline `quality → test → build → e2e` en verde; el E2E corre sin contenedores (Mongo en memoria, correo `memory`, storage `fs`) y sin `allow_failure`. Job manual `smoke:production` con `BASE_URL`.

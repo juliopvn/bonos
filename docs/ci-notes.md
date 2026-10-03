@@ -37,4 +37,31 @@ Sin Docker ni `services:` pero con internet → **modo sin contenedores**: `mong
 - Error observado: `eslint` analizó `.cache/ms-playwright/.../main.js` → 1 error `no-this-alias`
 - Hipótesis: fallo **de código/config** (ESLint no ignoraba directorios de caché del CI)
 - Cambio aplicado: `.cache/**` y `.pnpm-store/**` en `globalIgnores` (y en `.gitignore`/`.prettierignore`)
-- Resultado: ver siguiente intento
+- Resultado: no se aplicó (Prettier había cambiado las comillas del archivo y el reemplazo no encontró el texto); `quality` volvió a fallar igual
+
+### Intento 4 — 2026-10-03
+- Job / stage: `quality`
+- Error observado: el mismo `no-this-alias` en `.cache/ms-playwright/...`
+- Hipótesis: el ignore del intento 3 no llegó a `eslint.config.mjs`
+- Cambio aplicado: ignores añadidos de verdad; reproducido en local con un `.cache/` falso
+- Resultado: pipeline #3715 → `quality`, `test`, `build` y **`e2e` en verde (32 tests, 1.1 min)**
+
+## Estado final
+
+| Stage | Resultado | Duración aprox. |
+|---|---|---|
+| quality (lint + typecheck) | verde | 1 m 40 s |
+| test (72 tests, JUnit + cobertura Cobertura) | verde | 1 m 35 s |
+| build | verde | 1 m 50 s |
+| e2e (32 tests, modo sin contenedores) | **verde, sin `allow_failure`** | 2 m 54 s |
+
+No hizo falta `allow_failure` (Paso 5): los fallos fueron de configuración, no de infraestructura inestable.
+
+## Configuración final del runner que funcionó
+
+- Tag obligatorio: `default: tags: [cloudrun]` (el runner `cloudrun-ephemeral` tiene `run_untagged=false`).
+- `image:` se ignora; el job corre en Ubuntu 24.04 con Node 22. Se instala `pnpm@12.8.1` con `npm i -g` en `before_script`. El `engines` del proyecto es `>=24` y pnpm solo avisa; si algún día falla, pide al administrador una imagen con Node 24.
+- Sin Docker ni `services:` → E2E con `E2E_MAILBOX=memory E2E_MONGO=memory` (`mongodb-memory-server` en el puerto 27117, `MAIL_DRIVER=memory`, `STORAGE_DRIVER=fs`, `E2E_MODE=true`).
+- Chromium: `playwright install --with-deps chromium` (el job corre como root); cachés de pnpm, binarios de Mongo y Playwright por `pnpm-lock.yaml`.
+- Cola: el runner es efímero; un job puede tardar varios minutos en arrancar.
+- Jobs `diagnose` (manual) y `smoke:production` (manual, `BASE_URL`) se mantienen.
