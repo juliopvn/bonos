@@ -43,8 +43,12 @@ export async function adminOverview(asOf: Date = new Date()) {
   const today = startOfUtcDay(asOf);
   const in30 = new Date(today.getTime() + 30 * 86_400_000);
   const [byStatus, openBonds, upcoming, breaches, issuers] = await Promise.all([
-    (await col('bonds')).aggregate<{ _id: string; n: number }>([{ $group: { _id: '$status', n: { $sum: 1 } } }]).toArray(),
-    (await col('bonds')).aggregate<BondWithIssuer>([{ $match: { status: 'bookbuilding' } }, ...bondLookupStages]).toArray(),
+    (await col('bonds'))
+      .aggregate<{ _id: string; n: number }>([{ $group: { _id: '$status', n: { $sum: 1 } } }])
+      .toArray(),
+    (await col('bonds'))
+      .aggregate<BondWithIssuer>([{ $match: { status: 'bookbuilding' } }, ...bondLookupStages])
+      .toArray(),
     (await col('scheduledPayments'))
       .aggregate<{ total: number; n: number }>([
         { $match: { status: 'scheduled', dueDate: { $gte: today, $lte: in30 } } },
@@ -56,9 +60,18 @@ export async function adminOverview(asOf: Date = new Date()) {
   ]);
   const books = [];
   for (const bond of openBonds) {
-    const orders = await (await col('orders')).find({ bondId: bond._id, status: 'pending' }).toArray();
+    const orders = await (
+      await col('orders')
+    )
+      .find({ bondId: bond._id, status: 'pending' })
+      .toArray();
     const demand = aggregateDemand(
-      orders.map((o) => ({ id: o._id.toHexString(), units: o.units, limitPriceBps: o.limitPriceBps, createdAt: o.createdAt })),
+      orders.map((o) => ({
+        id: o._id.toHexString(),
+        units: o.units,
+        limitPriceBps: o.limitPriceBps,
+        createdAt: o.createdAt,
+      })),
       bond.totalUnits,
     );
     books.push({ bond, demand });

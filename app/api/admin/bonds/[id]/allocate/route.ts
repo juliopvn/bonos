@@ -8,6 +8,10 @@ import { closeBookSchema } from '@/lib/validation';
 export const POST = route<{ id: string }>(async (req, { params }) => {
   const s = await requireRole('admin');
   const { finalPriceBps } = closeBookSchema.parse(await readJson(req));
-  const { bond, allocatedUnits } = await closeAndAllocate(new ObjectId(s.sub), idParam((await params).id), finalPriceBps);
+  const { bond, allocatedUnits } = await closeAndAllocate(
+    new ObjectId(s.sub),
+    idParam((await params).id),
+    finalPriceBps,
+  );
   return ok({ bond, allocatedUnits });
 });

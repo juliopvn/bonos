@@ -11,7 +11,8 @@ export async function proxy(req: NextRequest) {
   const session = await verifySession(req.cookies.get(SESSION_COOKIE)?.value);
   const to = (path: string) => NextResponse.redirect(new URL(path, req.url));
 
-  if (pathname === '/') return to(session ? (session.role === 'admin' ? '/admin' : '/investor') : '/login');
+  if (pathname === '/')
+    return to(session ? (session.role === 'admin' ? '/admin' : '/investor') : '/login');
   if (!session) return to('/login');
   if (pathname.startsWith('/admin') && session.role !== 'admin') return to('/investor');
   if (pathname.startsWith('/investor') && session.role !== 'investor') return to('/admin');

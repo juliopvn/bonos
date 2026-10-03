@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export interface CurrentUser {
   id: string;
@@ -81,7 +89,11 @@ export function GlobalProvider({
             className="rise card px-4 py-3 text-sm shadow-lg"
             style={{
               borderLeft: `4px solid ${
-                t.kind === 'error' ? 'var(--color-vermilion)' : t.kind === 'info' ? 'var(--color-verdigris)' : 'var(--color-moss)'
+                t.kind === 'error'
+                  ? 'var(--color-vermilion)'
+                  : t.kind === 'info'
+                    ? 'var(--color-verdigris)'
+                    : 'var(--color-moss)'
               }`,
             }}
           >

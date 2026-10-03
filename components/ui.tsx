@@ -29,7 +29,17 @@ export function Empty({ title, children }: { title: string; children?: React.Rea
   );
 }
 
-export function Stat({ label, value, sub, tone }: { label: string; value: React.ReactNode; sub?: React.ReactNode; tone?: 'pos' | 'neg' }) {
+export function Stat({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: React.ReactNode;
+  sub?: React.ReactNode;
+  tone?: 'pos' | 'neg';
+}) {
   return (
     <div className="card card-pad">
       <p className="label">{label}</p>
@@ -69,7 +79,13 @@ export function OrderStatusBadge({ status }: { status: OrderStatus }) {
 
 export function RatingBadge({ rating }: { rating: string }) {
   const bad = rating.startsWith('B') && !rating.startsWith('BBB');
-  return <span className={`badge ${bad ? 'badge-bad' : rating.startsWith('BBB') ? 'badge-warn' : 'badge-info'}`}>{rating}</span>;
+  return (
+    <span
+      className={`badge ${bad ? 'badge-bad' : rating.startsWith('BBB') ? 'badge-warn' : 'badge-info'}`}
+    >
+      {rating}
+    </span>
+  );
 }
 
 export function Skeleton({ className = '' }: { className?: string }) {

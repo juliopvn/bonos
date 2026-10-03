@@ -18,7 +18,12 @@ export function valuePosition(p: HeldPosition) {
   const marketValue = marketValueCents(p.units, p.nominalCents, p.priceBps);
   const cost = costCents(p.units, p.nominalCents, p.avgCostBps);
   const pnl = marketValue - cost;
-  return { marketValueCents: marketValue, costCents: cost, pnlCents: pnl, pnlBps: cost === 0 ? 0 : mulDiv(pnl, 10_000, cost) };
+  return {
+    marketValueCents: marketValue,
+    costCents: cost,
+    pnlCents: pnl,
+    pnlBps: cost === 0 ? 0 : mulDiv(pnl, 10_000, cost),
+  };
 }
 
 export function valuePortfolio(positions: readonly HeldPosition[]) {
@@ -42,11 +47,19 @@ export interface Slice {
 }
 
 /** Reparto del valor por una dimensión (rating, sector, plazo…), ordenado de mayor a menor. */
-export function distribution<T>(items: readonly T[], keyOf: (i: T) => string, valueOf: (i: T) => number): Slice[] {
+export function distribution<T>(
+  items: readonly T[],
+  keyOf: (i: T) => string,
+  valueOf: (i: T) => number,
+): Slice[] {
   const totals = new Map<string, number>();
   for (const it of items) totals.set(keyOf(it), (totals.get(keyOf(it)) ?? 0) + valueOf(it));
   const total = sumCents([...totals.values()]);
   return [...totals.entries()]
-    .map(([key, valueCents]) => ({ key, valueCents, shareBps: total === 0 ? 0 : mulDiv(valueCents, 10_000, total) }))
+    .map(([key, valueCents]) => ({
+      key,
+      valueCents,
+      shareBps: total === 0 ? 0 : mulDiv(valueCents, 10_000, total),
+    }))
     .sort((a, b) => b.valueCents - a.valueCents || a.key.localeCompare(b.key));
 }

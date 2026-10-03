@@ -14,6 +14,8 @@ export async function GET(req: Request) {
   }
   const { user } = result;
   const res = NextResponse.redirect(`${base}${user.role === 'admin' ? '/admin' : '/investor'}`);
-  res.cookies.set(await sessionCookie({ sub: user._id.toHexString(), role: user.role, email: user.email }));
+  res.cookies.set(
+    await sessionCookie({ sub: user._id.toHexString(), role: user.role, email: user.email }),
+  );
   return res;
 }

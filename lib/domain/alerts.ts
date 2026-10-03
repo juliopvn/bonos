@@ -1,7 +1,8 @@
 import { mulDiv } from '../money';
 
 /** Variación absoluta de precio en bps del nominal (9800 → 10000 = 200). */
-export const priceMoveBps = (prevBps: number, currBps: number): number => Math.abs(currBps - prevBps);
+export const priceMoveBps = (prevBps: number, currBps: number): number =>
+  Math.abs(currBps - prevBps);
 
 export const exceedsPriceMove = (prevBps: number, currBps: number, thresholdBps: number): boolean =>
   priceMoveBps(prevBps, currBps) >= thresholdBps;
@@ -42,8 +43,10 @@ export function concentrationBreaches(
 
 /** Claves de deduplicación: una alerta por hecho, no por ejecución del job. */
 export const dedupe = {
-  rating: (issuerId: string, rating: string, isoDate: string) => `rating:${issuerId}:${rating}:${isoDate}`,
+  rating: (issuerId: string, rating: string, isoDate: string) =>
+    `rating:${issuerId}:${rating}:${isoDate}`,
   price: (bondId: string, isoDate: string) => `price:${bondId}:${isoDate}`,
-  rebalance: (dimension: string, key: string, isoDate: string) => `rebalance:${dimension}:${key}:${isoDate}`,
+  rebalance: (dimension: string, key: string, isoDate: string) =>
+    `rebalance:${dimension}:${key}:${isoDate}`,
   payment: (paymentId: string) => `payment:${paymentId}`,
 };

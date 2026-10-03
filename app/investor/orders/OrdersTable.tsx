@@ -33,7 +33,17 @@ export function OrdersTable({ rows }: { rows: Row[] }) {
   return (
     <div className="card table-wrap rise-2">
       <table className="table" data-testid="orders-table">
-        <thead><tr><th>Bono</th><th className="r">Títulos</th><th className="r">Precio límite</th><th className="r">Adjudicados</th><th>Estado</th><th>Fecha</th><th /></tr></thead>
+        <thead>
+          <tr>
+            <th>Bono</th>
+            <th className="r">Títulos</th>
+            <th className="r">Precio límite</th>
+            <th className="r">Adjudicados</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th />
+          </tr>
+        </thead>
         <tbody>
           {rows.map((o) => (
             <tr key={o._id} data-testid="order-row" data-status={o.status}>
@@ -41,11 +51,20 @@ export function OrdersTable({ rows }: { rows: Row[] }) {
               <td className="num r">{o.units.toLocaleString('es-MX')}</td>
               <td className="num r">{formatPrice(o.limitPriceBps)}</td>
               <td className="num r">{o.allocatedUnits.toLocaleString('es-MX')}</td>
-              <td><OrderStatusBadge status={o.status} /></td>
+              <td>
+                <OrderStatusBadge status={o.status} />
+              </td>
               <td className="num">{formatDateTime(o.createdAt)}</td>
               <td className="r">
                 {o.status === 'pending' && o.bookOpen && (
-                  <button className="btn btn-danger btn-sm" disabled={busy === o._id} onClick={() => cancel(o._id)} data-testid="cancel-order">Cancelar</button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    disabled={busy === o._id}
+                    onClick={() => cancel(o._id)}
+                    data-testid="cancel-order"
+                  >
+                    Cancelar
+                  </button>
                 )}
               </td>
             </tr>

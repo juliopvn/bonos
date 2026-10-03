@@ -16,7 +16,11 @@ describe('tablero de posición vs cálculo independiente', () => {
     const inv = await makeUser('cartera@test.local');
     const issuer = await makeIssuer('Emisor Cartera', 'A', 'Consumo');
     // Bono activo (emitido en 2020): 100 títulos, nominal $1,000, cupón 6% semestral.
-    const bond = await makeBond(admin._id, issuer._id, { issueDate: '2020-01-15', maturityDate: '2040-01-15', totalUnits: 100 });
+    const bond = await makeBond(admin._id, issuer._id, {
+      issueDate: '2020-01-15',
+      maturityDate: '2040-01-15',
+      totalUnits: 100,
+    });
     await openBookbuilding(admin._id, bond._id);
     await placeOrder(inv._id, { bondId: bond._id, units: 20, limitPriceBps: 9_800 });
     await closeAndAllocate(admin._id, bond._id, 9_800); // costo medio 98.00
@@ -24,7 +28,8 @@ describe('tablero de posición vs cálculo independiente', () => {
 
     const p = await getPortfolio(inv._id, d('2026-03-01'));
     // ── Cálculo independiente con aritmética de enteros escrita a mano ──
-    const units = 20, nominal = 100_000;
+    const units = 20,
+      nominal = 100_000;
     const market = (units * nominal * 10_150) / 10_000; // 2,030,000
     const cost = (units * nominal * 9_800) / 10_000; // 1,960,000
     expect(p.marketValueCents).toBe(market);
@@ -35,7 +40,11 @@ describe('tablero de posición vs cálculo independiente', () => {
     // Pagos: el job de 2026-03-01 cobra los cupones semestrales vencidos (15-jul y 15-ene).
     await runPaymentsJob(d('2026-03-01'));
     const after = await getPortfolio(inv._id, d('2026-03-01'));
-    const paid = await (await col('scheduledPayments')).find({ investorId: inv._id, status: 'paid' }).toArray();
+    const paid = await (
+      await col('scheduledPayments')
+    )
+      .find({ investorId: inv._id, status: 'paid' })
+      .toArray();
     const couponsPaid = paid.filter((x) => x.type === 'coupon').length;
     expect(after.collectedCents).toBe(couponsPaid * 20 * 3_000);
     const remainingCoupons = 28 - couponsPaid; // 20 años × 2 = 40 cupones totales
@@ -51,7 +60,11 @@ describe('tablero de posición vs cálculo independiente', () => {
     const admin = await makeUser('admin@test.local', 'admin');
     const inv = await makeUser('compra@test.local');
     const issuer = await makeIssuer('Emisor Compra');
-    const bond = await makeBond(admin._id, issuer._id, { issueDate: '2020-01-15', maturityDate: '2040-01-15', totalUnits: 50 });
+    const bond = await makeBond(admin._id, issuer._id, {
+      issueDate: '2020-01-15',
+      maturityDate: '2040-01-15',
+      totalUnits: 50,
+    });
     // Se coloca el 20% y el resto queda como inventario.
     const seed = await makeUser('seed@test.local');
     await openBookbuilding(admin._id, bond._id);
@@ -67,7 +80,11 @@ describe('tablero de posición vs cálculo independiente', () => {
 
     const pos = await (await col('positions')).findOne({ investorId: inv._id, bondId: bond._id });
     expect(pos).toMatchObject({ units: 20, avgCostBps: 10_000 }); // (10×95 + 10×105) / 20
-    const pays = await (await col('scheduledPayments')).find({ investorId: inv._id, bondId: bond._id, type: 'principal' }).toArray();
+    const pays = await (
+      await col('scheduledPayments')
+    )
+      .find({ investorId: inv._id, bondId: bond._id, type: 'principal' })
+      .toArray();
     expect(pays).toHaveLength(1); // se acumula en un solo documento
     expect(pays[0].amountCents).toBe(20 * 100_000);
     expect((await (await col('bonds')).findOne({ _id: bond._id }))?.availableUnits).toBe(20);

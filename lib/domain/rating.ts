@@ -1,6 +1,24 @@
 export const RATING_SCALE = [
-  'AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB+', 'BBB', 'BBB-',
-  'BB+', 'BB', 'BB-', 'B+', 'B', 'B-', 'CCC', 'CC', 'C', 'D',
+  'AAA',
+  'AA+',
+  'AA',
+  'AA-',
+  'A+',
+  'A',
+  'A-',
+  'BBB+',
+  'BBB',
+  'BBB-',
+  'BB+',
+  'BB',
+  'BB-',
+  'B+',
+  'B',
+  'B-',
+  'CCC',
+  'CC',
+  'C',
+  'D',
 ] as const;
 
 export type Rating = (typeof RATING_SCALE)[number];

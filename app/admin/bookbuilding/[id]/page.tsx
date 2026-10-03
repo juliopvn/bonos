@@ -16,7 +16,11 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
   if (!book) notFound();
   return (
     <>
-      <p className="mb-3 text-sm"><Link href="/admin/bookbuilding" className="underline">← Bookbuilding</Link></p>
+      <p className="mb-3 text-sm">
+        <Link href="/admin/bookbuilding" className="underline">
+          ← Bookbuilding
+        </Link>
+      </p>
       <PageHeader eyebrow="Libro de órdenes" title={book.bond.name} />
       <LiveBook bondId={id} initial={plain(book)} />
     </>

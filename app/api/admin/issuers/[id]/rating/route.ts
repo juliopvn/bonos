@@ -12,7 +12,11 @@ export const POST = route<{ id: string }>(async (req, { params }) => {
   const id = idParam((await params).id);
   const { rating, agency } = ratingChangeSchema.parse(await readJson(req));
   const { previous, issuer } = await changeIssuerRating(id, rating, agency);
-  await audit(new ObjectId(s.sub), 'issuer.rating_change', 'issuer', id, { from: previous, to: rating, agency });
+  await audit(new ObjectId(s.sub), 'issuer.rating_change', 'issuer', id, {
+    from: previous,
+    to: rating,
+    agency,
+  });
   const alerts = previous === rating ? 0 : await notifyRatingChange(id);
   return ok({ issuer, previous, alertsCreated: alerts });
 });

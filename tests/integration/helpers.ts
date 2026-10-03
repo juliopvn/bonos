@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, rmSync } from 'node:fs';
 import { MongoClient, ObjectId } from 'mongodb';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { afterAll, beforeAll } from 'vitest';
@@ -18,7 +18,9 @@ const DOCKER_URI = 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=t
 function localMongoUri(): string {
   if (process.env.MONGODB_URI) return process.env.MONGODB_URI;
   try {
-    const line = readFileSync('.env.local', 'utf8').split('\n').find((l) => l.startsWith('MONGODB_URI='));
+    const line = readFileSync('.env.local', 'utf8')
+      .split('\n')
+      .find((l) => l.startsWith('MONGODB_URI='));
     if (line) return line.slice('MONGODB_URI='.length).trim();
   } catch {
     /* sin .env.local */
@@ -72,12 +74,16 @@ export function setupTestDb() {
     await (await db()).dropDatabase();
     await closeDb();
     await memory?.stop();
+    rmSync(process.env.STORAGE_FS_DIR!, { recursive: true, force: true });
   });
 }
 
 export const d = parseISODate;
 
-export async function makeUser(email: string, role: 'admin' | 'investor' = 'investor'): Promise<UserDoc> {
+export async function makeUser(
+  email: string,
+  role: 'admin' | 'investor' = 'investor',
+): Promise<UserDoc> {
   const user = await upsertUserOnLogin(email);
   if (user.role !== role) {
     await (await col('users')).updateOne({ _id: user._id }, { $set: { role } });

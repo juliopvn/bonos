@@ -12,8 +12,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function OrdersPage() {
   const session = await requirePageRole('investor');
-  const orders = await (await col('orders')).find({ investorId: new ObjectId(session.sub) }).sort({ createdAt: -1 }).toArray();
-  const bonds = await bondsByIds([...new Set(orders.map((o) => o.bondId.toHexString()))].map((i) => new ObjectId(i)));
+  const orders = await (
+    await col('orders')
+  )
+    .find({ investorId: new ObjectId(session.sub) })
+    .sort({ createdAt: -1 })
+    .toArray();
+  const bonds = await bondsByIds(
+    [...new Set(orders.map((o) => o.bondId.toHexString()))].map((i) => new ObjectId(i)),
+  );
   const rows = orders.map((o) => ({
     ...plain(o),
     bondName: bonds.get(o.bondId.toHexString())?.name ?? 'Bono',
@@ -22,7 +29,13 @@ export default async function OrdersPage() {
   return (
     <>
       <PageHeader eyebrow="Mercado primario" title="Mis órdenes" />
-      {rows.length === 0 ? <Empty title="Todavía no has colocado órdenes">Cuando una emisión abra su libro, podrás ofertar títulos con un precio límite.</Empty> : <OrdersTable rows={rows} />}
+      {rows.length === 0 ? (
+        <Empty title="Todavía no has colocado órdenes">
+          Cuando una emisión abra su libro, podrás ofertar títulos con un precio límite.
+        </Empty>
+      ) : (
+        <OrdersTable rows={rows} />
+      )}
     </>
   );
 }

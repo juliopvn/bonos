@@ -8,7 +8,8 @@ export function formatBps(bps: number, digits = 2): string {
   const abs = Math.abs(bps);
   const whole = Math.trunc(abs / 100);
   const frac = String(abs % 100).padStart(2, '0');
-  const text = digits >= 2 ? `${whole}.${frac}` : `${whole}.${frac}`.replace(/0+$/, '').replace(/\.$/, '');
+  const text =
+    digits >= 2 ? `${whole}.${frac}` : `${whole}.${frac}`.replace(/0+$/, '').replace(/\.$/, '');
   return `${sign}${text}%`;
 }
 

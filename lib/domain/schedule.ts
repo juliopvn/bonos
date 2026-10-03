@@ -90,7 +90,11 @@ export function generateSchedule(input: ScheduleInput): ScheduleFlow[] {
 }
 
 /** Flujos de un inversor: por título × unidades; solo los posteriores a `after` (compra en secundario). */
-export function flowsForUnits(flows: readonly ScheduleFlow[], units: number, after?: Date): ScheduleFlow[] {
+export function flowsForUnits(
+  flows: readonly ScheduleFlow[],
+  units: number,
+  after?: Date,
+): ScheduleFlow[] {
   return flows
     .filter((f) => !after || f.dueDate > after)
     .map((f) => ({ ...f, amountCents: f.amountCents * units }));

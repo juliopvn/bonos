@@ -59,7 +59,11 @@ export interface Allocation {
  * se reparte de a un título por orden de llegada (hasta lo solicitado).
  * Invariante: Σ adjudicado = min(títulos ofertados, demanda elegible).
  */
-export function allocate(orders: readonly BookOrder[], finalPriceBps: number, offeredUnits: number): Allocation[] {
+export function allocate(
+  orders: readonly BookOrder[],
+  finalPriceBps: number,
+  offeredUnits: number,
+): Allocation[] {
   const eligible = orders
     .filter((o) => o.limitPriceBps >= finalPriceBps)
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime() || a.id.localeCompare(b.id));
@@ -92,7 +96,8 @@ export function allocate(orders: readonly BookOrder[], finalPriceBps: number, of
 
   return orders.map((o) => {
     const allocatedUnits = granted.get(o.id) ?? 0;
-    const status = allocatedUnits === 0 ? 'rejected' : allocatedUnits === o.units ? 'allocated' : 'partial';
+    const status =
+      allocatedUnits === 0 ? 'rejected' : allocatedUnits === o.units ? 'allocated' : 'partial';
     return { id: o.id, allocatedUnits, status };
   });
 }

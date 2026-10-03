@@ -5,7 +5,14 @@ import { parseISODate as d } from '@/lib/domain/dates';
 
 const nominal = 100_000;
 const mk = (rate: number, freq: 1 | 2 | 4 | 12, from: string, to: string) =>
-  generateSchedule({ nominalCents: nominal, annualRateBps: rate, frequency: freq, dayCount: '30/360', issueDate: d(from), maturityDate: d(to) });
+  generateSchedule({
+    nominalCents: nominal,
+    annualRateBps: rate,
+    frequency: freq,
+    dayCount: '30/360',
+    issueDate: d(from),
+    maturityDate: d(to),
+  });
 
 describe('YTM', () => {
   it('a la par, YTM = cupón (semestral)', () => {

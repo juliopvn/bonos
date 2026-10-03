@@ -37,7 +37,8 @@ export async function createIssuer(input: {
   try {
     await (await col('issuers')).insertOne(doc);
   } catch (e) {
-    if ((e as { code?: number }).code === 11000) throw conflict('Ya existe un emisor con ese nombre');
+    if ((e as { code?: number }).code === 11000)
+      throw conflict('Ya existe un emisor con ese nombre');
     throw e;
   }
   return doc;
@@ -47,7 +48,9 @@ export async function updateIssuer(
   id: ObjectId,
   patch: { name?: string; sector?: string; country?: string },
 ): Promise<IssuerDoc> {
-  const res = await (await col('issuers')).findOneAndUpdate({ _id: id }, { $set: patch }, { returnDocument: 'after' });
+  const res = await (
+    await col('issuers')
+  ).findOneAndUpdate({ _id: id }, { $set: patch }, { returnDocument: 'after' });
   if (!res) throw notFound('Emisor');
   return res;
 }

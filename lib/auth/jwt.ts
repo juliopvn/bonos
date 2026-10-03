@@ -11,7 +11,9 @@ export interface SessionClaims {
   email: string;
 }
 
-export async function signMagicToken(email: string): Promise<{ token: string; jti: string; expiresAt: Date }> {
+export async function signMagicToken(
+  email: string,
+): Promise<{ token: string; jti: string; expiresAt: Date }> {
   const ttl = getEnv().MAGIC_LINK_TTL_MINUTES;
   const jti = randomUUID();
   const expiresAt = new Date(Date.now() + ttl * 60_000);
@@ -24,7 +26,9 @@ export async function signMagicToken(email: string): Promise<{ token: string; jt
   return { token, jti, expiresAt };
 }
 
-export async function verifyMagicToken(token: string): Promise<{ email: string; jti: string } | null> {
+export async function verifyMagicToken(
+  token: string,
+): Promise<{ email: string; jti: string } | null> {
   try {
     const { payload } = await jwtVerify(token, key(), { algorithms: ['HS256'] });
     if (payload.typ !== 'magic' || typeof payload.email !== 'string' || !payload.jti) return null;

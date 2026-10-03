@@ -21,7 +21,10 @@ function getS3(): S3Client {
       endpoint: env.S3_ENDPOINT,
       region: env.S3_REGION,
       forcePathStyle: env.S3_FORCE_PATH_STYLE,
-      credentials: { accessKeyId: env.S3_ACCESS_KEY_ID!, secretAccessKey: env.S3_SECRET_ACCESS_KEY! },
+      credentials: {
+        accessKeyId: env.S3_ACCESS_KEY_ID!,
+        secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
+      },
     });
   }
   return s3;
@@ -49,7 +52,7 @@ const fsPath = (key: string) => {
   const full = path.resolve(root, key);
   if (!full.startsWith(root + path.sep)) throw new Error('Clave de almacenamiento inválida');
   return full;
-}
+};
 
 export async function putObject(key: string, body: Buffer, contentType: string): Promise<void> {
   const env = getEnv();
@@ -70,7 +73,8 @@ export async function readFsObject(key: string): Promise<Buffer> {
   return readFile(fsPath(key));
 }
 
-const sign = (payload: string) => createHmac('sha256', getEnv().AUTH_SECRET).update(payload).digest('hex');
+const sign = (payload: string) =>
+  createHmac('sha256', getEnv().AUTH_SECRET).update(payload).digest('hex');
 
 export function verifyFsSignature(key: string, exp: number, sig: string): boolean {
   if (!Number.isFinite(exp) || exp < Date.now() / 1000) return false;
@@ -85,7 +89,12 @@ export async function getDownloadUrl(key: string, fileName: string): Promise<str
   const ttl = env.S3_PRESIGNED_TTL_SECONDS;
   if (env.STORAGE_DRIVER === 'fs') {
     const exp = Math.floor(Date.now() / 1000) + ttl;
-    const params = new URLSearchParams({ key, exp: String(exp), sig: sign(`${key}.${exp}`), name: fileName });
+    const params = new URLSearchParams({
+      key,
+      exp: String(exp),
+      sig: sign(`${key}.${exp}`),
+      name: fileName,
+    });
     return `${env.APP_BASE_URL}/api/storage/download?${params}`;
   }
   await ensureBucket();

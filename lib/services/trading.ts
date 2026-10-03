@@ -27,7 +27,9 @@ export async function buyActiveBond(investorId: ObjectId, bondId: ObjectId, unit
         throw conflict('Solo se pueden comprar bonos vigentes; en bookbuilding coloca una orden');
       }
       // Reserva atómica de inventario.
-      const reserved = await (await col('bonds')).findOneAndUpdate(
+      const reserved = await (
+        await col('bonds')
+      ).findOneAndUpdate(
         { _id: bondId, status: 'active', availableUnits: { $gte: units } },
         { $inc: { availableUnits: -units } },
         { session },
@@ -39,8 +41,16 @@ export async function buyActiveBond(investorId: ObjectId, bondId: ObjectId, unit
       const existing = await positions.findOne({ investorId, bondId }, { session });
       if (existing && existing.units > 0) {
         const totalUnits = existing.units + units;
-        const avgCostBps = mulDiv(existing.units * existing.avgCostBps + units * priceBps, 1, totalUnits);
-        await positions.updateOne({ _id: existing._id }, { $set: { units: totalUnits, avgCostBps } }, { session });
+        const avgCostBps = mulDiv(
+          existing.units * existing.avgCostBps + units * priceBps,
+          1,
+          totalUnits,
+        );
+        await positions.updateOne(
+          { _id: existing._id },
+          { $set: { units: totalUnits, avgCostBps } },
+          { session },
+        );
       } else if (existing) {
         await positions.updateOne(
           { _id: existing._id },
@@ -59,7 +69,10 @@ export async function buyActiveBond(investorId: ObjectId, bondId: ObjectId, unit
       for (const f of flowsForUnits(bondFlows(bond), units, today)) {
         await payments.updateOne(
           { bondId, investorId, type: f.type, dueDate: f.dueDate },
-          { $inc: { amountCents: f.amountCents }, $setOnInsert: { _id: new ObjectId(), status: 'scheduled', paidAt: null } },
+          {
+            $inc: { amountCents: f.amountCents },
+            $setOnInsert: { _id: new ObjectId(), status: 'scheduled', paidAt: null },
+          },
           { upsert: true, session },
         );
       }

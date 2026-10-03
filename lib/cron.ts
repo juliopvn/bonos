@@ -14,7 +14,8 @@ export function authorizeCron(req: Request): Date {
   const date = new URL(req.url).searchParams.get('date');
   if (date) {
     // Simular el paso del tiempo solo se permite fuera de producción o en modo E2E.
-    if (env.NODE_ENV === 'production' && !env.E2E_MODE) throw new HttpError(400, 'El parámetro date no está permitido');
+    if (env.NODE_ENV === 'production' && !env.E2E_MODE)
+      throw new HttpError(400, 'El parámetro date no está permitido');
     return parseISODate(date);
   }
   return startOfUtcDay(new Date());

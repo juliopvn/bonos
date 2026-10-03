@@ -10,7 +10,9 @@ export const PATCH = route<{ id: string }>(async (req, { params }) => {
   const s = await requireRole('admin');
   const id = idParam((await params).id);
   const { status } = covenantStatusSchema.parse(await readJson(req));
-  const doc = await (await col('covenants')).findOneAndUpdate(
+  const doc = await (
+    await col('covenants')
+  ).findOneAndUpdate(
     { _id: id },
     { $set: { status, lastCheckedAt: new Date() } },
     { returnDocument: 'after' },

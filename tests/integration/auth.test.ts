@@ -37,7 +37,9 @@ describe('magic link', () => {
   it('token expirado → error expired', async () => {
     await requestMagicLink('exp@test.local', '1.1.1.4');
     const token = await tokenFrom('exp@test.local');
-    await (await col('magicLinks')).updateMany({ email: 'exp@test.local' }, { $set: { expiresAt: new Date(Date.now() - 1000) } });
+    await (
+      await col('magicLinks')
+    ).updateMany({ email: 'exp@test.local' }, { $set: { expiresAt: new Date(Date.now() - 1000) } });
     expect(await consumeMagicLink(token)).toEqual({ error: 'expired' });
   });
 
@@ -48,7 +50,9 @@ describe('magic link', () => {
 
   it('rate limit por correo', async () => {
     for (let i = 0; i < 3; i++) await requestMagicLink('rl@test.local', `2.2.2.${i}`);
-    await expect(requestMagicLink('rl@test.local', '2.2.2.9')).rejects.toMatchObject({ status: 429 });
+    await expect(requestMagicLink('rl@test.local', '2.2.2.9')).rejects.toMatchObject({
+      status: 429,
+    });
   });
 
   it('el JWT de sesión conserva sub y rol; uno ajeno se rechaza', async () => {

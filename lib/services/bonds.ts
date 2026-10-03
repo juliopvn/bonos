@@ -3,7 +3,12 @@ import { z } from 'zod';
 import { audit } from '../audit';
 import { col } from '../db';
 import { deriveTerm } from '../domain/term';
-import { effectiveRateBps, flowsForUnits, generateSchedule, type ScheduleFlow } from '../domain/schedule';
+import {
+  effectiveRateBps,
+  flowsForUnits,
+  generateSchedule,
+  type ScheduleFlow,
+} from '../domain/schedule';
 import { ytmFromPrice } from '../domain/ytm';
 import { startOfUtcDay, toISODate } from '../domain/dates';
 import { conflict, badRequest } from '../http';
@@ -82,7 +87,8 @@ export async function createBond(actorId: ObjectId, input: BondInput): Promise<B
   try {
     await (await col('bonds')).insertOne(doc);
   } catch (e) {
-    if ((e as { code?: number }).code === 11000) throw conflict('Ya existe una emisión con ese código');
+    if ((e as { code?: number }).code === 11000)
+      throw conflict('Ya existe una emisión con ese código');
     throw e;
   }
   await audit(actorId, 'bond.create', 'bond', doc._id, { code: doc.code, status: 'draft' });
@@ -90,7 +96,9 @@ export async function createBond(actorId: ObjectId, input: BondInput): Promise<B
 }
 
 export async function openBookbuilding(actorId: ObjectId, bondId: ObjectId): Promise<BondDoc> {
-  const res = await (await col('bonds')).findOneAndUpdate(
+  const res = await (
+    await col('bonds')
+  ).findOneAndUpdate(
     { _id: bondId, status: 'draft' },
     { $set: { status: 'bookbuilding' } },
     { returnDocument: 'after' },
@@ -99,7 +107,10 @@ export async function openBookbuilding(actorId: ObjectId, bondId: ObjectId): Pro
     await getBond(bondId); // 404 si no existe
     throw conflict('Solo una emisión en borrador puede abrir el bookbuilding');
   }
-  await audit(actorId, 'bond.open_bookbuilding', 'bond', bondId, { from: 'draft', to: 'bookbuilding' });
+  await audit(actorId, 'bond.open_bookbuilding', 'bond', bondId, {
+    from: 'draft',
+    to: 'bookbuilding',
+  });
   return res;
 }
 
@@ -114,10 +125,15 @@ export async function updateReferenceRate(
 ): Promise<{ bond: BondDoc; recalculated: number }> {
   const bonds = await col('bonds');
   const bond = await getBond(bondId);
-  if (bond.couponType !== 'floating') throw badRequest('Solo los bonos de tasa variable tienen tasa de referencia');
+  if (bond.couponType !== 'floating')
+    throw badRequest('Solo los bonos de tasa variable tienen tasa de referencia');
   if (bond.status === 'matured') throw conflict('El bono ya venció');
 
-  const updated = await bonds.findOneAndUpdate({ _id: bondId }, { $set: { referenceRateBps } }, { returnDocument: 'after' });
+  const updated = await bonds.findOneAndUpdate(
+    { _id: bondId },
+    { $set: { referenceRateBps } },
+    { returnDocument: 'after' },
+  );
   const next = updated!;
   const unitByDate = new Map(
     bondFlows(next)
@@ -167,12 +183,18 @@ export async function updateMarketPrice(
 
   const history = await col('priceHistory');
   await history.updateOne({ bondId, date }, { $set: { priceBps, ytmBps } }, { upsert: true });
-  const updated = await (await col('bonds')).findOneAndUpdate(
+  const updated = await (
+    await col('bonds')
+  ).findOneAndUpdate(
     { _id: bondId },
     { $set: { marketPriceBps: priceBps, ytmBps } },
     { returnDocument: 'after' },
   );
-  await audit(actorId, 'bond.market_price', 'bond', bondId, { from: bond.marketPriceBps, to: priceBps, ytmBps });
+  await audit(actorId, 'bond.market_price', 'bond', bondId, {
+    from: bond.marketPriceBps,
+    to: priceBps,
+    ytmBps,
+  });
   await evaluatePriceMoves(date, bondId);
   return updated!;
 }

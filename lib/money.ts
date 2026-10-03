@@ -6,7 +6,8 @@
 export class MoneyError extends Error {}
 
 function assertSafeInt(n: number, label: string): void {
-  if (!Number.isSafeInteger(n)) throw new MoneyError(`${label} debe ser un entero seguro (recibido ${n})`);
+  if (!Number.isSafeInteger(n))
+    throw new MoneyError(`${label} debe ser un entero seguro (recibido ${n})`);
 }
 
 /** round(a × b / c) con redondeo half-even. Usa BigInt internamente: sin pérdida de precisión. */
@@ -72,8 +73,9 @@ export function formatMoney(cents: number, currency = 'MXN'): string {
   const whole = Math.trunc(abs / 100);
   const frac = abs % 100;
   // El decimal se construye con enteros para no introducir error de coma flotante.
-  return currencyFormatter(currency)
-    .format(sign * Number(`${whole}.${String(frac).padStart(2, '0')}`));
+  return currencyFormatter(currency).format(
+    sign * Number(`${whole}.${String(frac).padStart(2, '0')}`),
+  );
 }
 
 /** Convierte "1234.56" / "1,234.56" a céntimos sin pasar por coma flotante. */

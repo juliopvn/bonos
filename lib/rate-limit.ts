@@ -9,7 +9,10 @@ export async function rateLimit(key: string, max: number, windowSeconds: number)
   await rl.deleteOne({ key, expiresAt: { $lte: now } });
   const doc = await rl.findOneAndUpdate(
     { key },
-    { $inc: { count: 1 }, $setOnInsert: { expiresAt: new Date(now.getTime() + windowSeconds * 1000) } },
+    {
+      $inc: { count: 1 },
+      $setOnInsert: { expiresAt: new Date(now.getTime() + windowSeconds * 1000) },
+    },
     { upsert: true, returnDocument: 'after' },
   );
   if (doc && doc.count > max) {

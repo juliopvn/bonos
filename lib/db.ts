@@ -17,8 +17,7 @@ type Collections = {
   auditLog: T.AuditLogDoc;
   testMailbox: T.TestMailDoc;
   rateLimits: T.RateLimitDoc;
-  jobState: T.JobStateDoc;
-}
+};
 
 // Reutiliza el cliente entre hot-reloads (dev) e invocaciones calientes (serverless).
 const g = globalThis as unknown as {
@@ -48,7 +47,9 @@ export async function getDb(): Promise<Db> {
   return db;
 }
 
-export async function col<K extends keyof Collections>(name: K): Promise<Collection<Collections[K]>> {
+export async function col<K extends keyof Collections>(
+  name: K,
+): Promise<Collection<Collections[K]>> {
   const db = await getDb();
   return db.collection<Collections[K]>(name);
 }
@@ -82,7 +83,6 @@ export async function ensureIndexes(db: Db): Promise<void> {
     db.collection('testMailbox').createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 }),
     db.collection('rateLimits').createIndex({ key: 1 }, { unique: true }),
     db.collection('rateLimits').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-    db.collection('jobState').createIndex({ key: 1 }, { unique: true }),
   ]);
 }
 

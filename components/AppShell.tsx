@@ -36,6 +36,12 @@ export function AppShell({
   const items = role === 'admin' ? ADMIN_NAV : INVESTOR_NAV;
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[248px_1fr]">
+      <a
+        href="#contenido"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-gilt focus:px-3 focus:py-2 focus:text-white"
+      >
+        Saltar al contenido
+      </a>
       <aside className="bg-verdigris-deep text-white lg:sticky lg:top-0 lg:h-screen">
         <div className="flex items-center justify-between px-5 py-4 lg:block lg:px-6 lg:py-7">
           <div>
@@ -48,7 +54,10 @@ export function AppShell({
             <LogoutButton />
           </div>
         </div>
-        <nav aria-label="Principal" className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:px-3 lg:pb-0">
+        <nav
+          aria-label="Principal"
+          className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:px-3 lg:pb-0"
+        >
           <NavLinks items={items} />
         </nav>
         <div className="absolute inset-x-0 bottom-0 hidden border-t border-white/10 p-5 lg:block">

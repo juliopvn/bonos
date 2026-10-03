@@ -7,7 +7,8 @@ const bool = (fallback: 'true' | 'false') =>
     .transform((v) => v === 'true');
 
 const emptyToUndefined = (v: unknown) => (v === '' ? undefined : v);
-const optional = <T extends z.ZodType>(schema: T) => z.preprocess(emptyToUndefined, schema.optional());
+const optional = <T extends z.ZodType>(schema: T) =>
+  z.preprocess(emptyToUndefined, schema.optional());
 
 const schema = z
   .object({
@@ -92,7 +93,9 @@ export function getEnv(): Env {
   if (cached) return cached;
   const parsed = schema.safeParse(process.env);
   if (!parsed.success) {
-    const lines = parsed.error.issues.map((i) => `  - ${i.path.join('.') || '(env)'}: ${i.message}`);
+    const lines = parsed.error.issues.map(
+      (i) => `  - ${i.path.join('.') || '(env)'}: ${i.message}`,
+    );
     throw new Error(`Variables de entorno inválidas:\n${lines.join('\n')}\nRevisa .env.example.`);
   }
   const env = parsed.data;

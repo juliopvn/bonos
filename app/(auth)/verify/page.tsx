@@ -9,7 +9,11 @@ const MESSAGES: Record<string, string> = {
   invalid: 'Este enlace no es válido. Pide uno nuevo para entrar.',
 };
 
-export default async function VerifyPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function VerifyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { error } = await searchParams;
   const message = MESSAGES[error ?? 'invalid'] ?? MESSAGES.invalid;
   return (

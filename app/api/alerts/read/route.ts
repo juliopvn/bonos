@@ -11,7 +11,11 @@ const schema = z.object({ ids: z.array(objectId).max(200).optional() });
 export const POST = route(async (req) => {
   const s = await requireRole('investor');
   const { ids } = schema.parse(await readJson(req));
-  const filter = { investorId: new ObjectId(s.sub), readAt: null, ...(ids ? { _id: { $in: ids } } : {}) };
+  const filter = {
+    investorId: new ObjectId(s.sub),
+    readAt: null,
+    ...(ids ? { _id: { $in: ids } } : {}),
+  };
   const res = await (await col('alerts')).updateMany(filter, { $set: { readAt: new Date() } });
   return ok({ updated: res.modifiedCount });
 });

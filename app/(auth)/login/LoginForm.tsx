@@ -23,13 +23,21 @@ export function LoginForm() {
 
   if (state === 'sent') {
     return (
-      <div role="status" data-testid="login-sent" className="mt-6 border-l-4 border-moss bg-white p-4">
+      <div
+        role="status"
+        data-testid="login-sent"
+        className="mt-6 border-l-4 border-moss bg-white p-4"
+      >
         <p className="font-semibold">Revisa tu correo</p>
         <p className="muted mt-1 text-sm">
-          Si <span className="num">{email}</span> puede acceder, ya tiene un enlace esperándole. Caduca en
-          15 minutos.
+          Si <span className="num">{email}</span> puede acceder, ya tiene un enlace esperándole.
+          Caduca en 15 minutos.
         </p>
-        <button type="button" className="btn btn-ghost btn-sm mt-3" onClick={() => setState('idle')}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm mt-3"
+          onClick={() => setState('idle')}
+        >
           Usar otro correo
         </button>
       </div>
@@ -61,7 +69,12 @@ export function LoginForm() {
           </p>
         )}
       </div>
-      <button type="submit" className="btn btn-primary w-full" disabled={state === 'sending'} data-testid="login-submit">
+      <button
+        type="submit"
+        className="btn btn-primary w-full"
+        disabled={state === 'sending'}
+        data-testid="login-submit"
+      >
         {state === 'sending' ? 'Enviando…' : 'Enviarme el enlace'}
       </button>
     </form>

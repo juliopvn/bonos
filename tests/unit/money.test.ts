@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
-  addCents, applyBps, divRound, formatMoney, mulDiv, parseMoneyToCents, roundHalfEven, sumCents, MoneyError,
+  addCents,
+  applyBps,
+  divRound,
+  formatMoney,
+  mulDiv,
+  parseMoneyToCents,
+  roundHalfEven,
+  sumCents,
+  MoneyError,
 } from '@/lib/money';
 import { formatBps, formatPrice, percentToBps } from '@/lib/bps';
 

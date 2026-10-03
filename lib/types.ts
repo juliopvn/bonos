@@ -16,7 +16,7 @@ export type AlertPrefs = {
   priceMoveBps: number;
   concentrationPct: number;
   email: boolean;
-}
+};
 
 export type UserDoc = {
   _id: ObjectId;
@@ -25,7 +25,7 @@ export type UserDoc = {
   role: Role;
   createdAt: Date;
   alertPrefs: AlertPrefs;
-}
+};
 
 export type MagicLinkDoc = {
   _id: ObjectId;
@@ -33,13 +33,13 @@ export type MagicLinkDoc = {
   email: string;
   expiresAt: Date;
   usedAt: Date | null;
-}
+};
 
 export type RatingEntry = {
   rating: string;
   date: Date;
   agency: string;
-}
+};
 
 export type IssuerDoc = {
   _id: ObjectId;
@@ -49,7 +49,7 @@ export type IssuerDoc = {
   rating: string;
   ratingHistory: RatingEntry[];
   createdAt: Date;
-}
+};
 
 export type BondDoc = {
   _id: ObjectId;
@@ -74,7 +74,7 @@ export type BondDoc = {
   marketPriceBps: number | null;
   ytmBps: number | null;
   createdAt: Date;
-}
+};
 
 export type PriceHistoryDoc = {
   _id: ObjectId;
@@ -82,7 +82,7 @@ export type PriceHistoryDoc = {
   date: Date;
   priceBps: number;
   ytmBps: number;
-}
+};
 
 export type OrderDoc = {
   _id: ObjectId;
@@ -93,7 +93,7 @@ export type OrderDoc = {
   status: OrderStatus;
   allocatedUnits: number;
   createdAt: Date;
-}
+};
 
 export type PositionDoc = {
   _id: ObjectId;
@@ -102,7 +102,7 @@ export type PositionDoc = {
   units: number;
   avgCostBps: number;
   acquiredAt: Date;
-}
+};
 
 export type ScheduledPaymentDoc = {
   _id: ObjectId;
@@ -113,7 +113,7 @@ export type ScheduledPaymentDoc = {
   amountCents: number;
   status: PaymentStatus;
   paidAt: Date | null;
-}
+};
 
 export type DocumentDoc = {
   _id: ObjectId;
@@ -126,7 +126,7 @@ export type DocumentDoc = {
   sizeBytes: number;
   uploadedBy: ObjectId;
   createdAt: Date;
-}
+};
 
 export type CovenantDoc = {
   _id: ObjectId;
@@ -136,7 +136,7 @@ export type CovenantDoc = {
   threshold: string;
   status: 'ok' | 'breach';
   lastCheckedAt: Date;
-}
+};
 
 export type AlertDoc = {
   _id: ObjectId;
@@ -147,7 +147,7 @@ export type AlertDoc = {
   readAt: Date | null;
   emailedAt: Date | null;
   createdAt: Date;
-}
+};
 
 export type AuditLogDoc = {
   _id: ObjectId;
@@ -157,7 +157,7 @@ export type AuditLogDoc = {
   entityId: string;
   diff: Record<string, unknown>;
   createdAt: Date;
-}
+};
 
 export type TestMailDoc = {
   _id: ObjectId;
@@ -166,17 +166,11 @@ export type TestMailDoc = {
   html: string;
   text: string;
   createdAt: Date;
-}
+};
 
 export type RateLimitDoc = {
   _id: ObjectId;
   key: string;
   count: number;
   expiresAt: Date;
-}
-
-export type JobStateDoc = {
-  _id: ObjectId;
-  key: string;
-  value: unknown;
-}
+};

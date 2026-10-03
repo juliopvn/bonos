@@ -18,7 +18,11 @@ async function check(fn: () => Promise<void>): Promise<'ok' | 'error'> {
 }
 
 export async function GET() {
-  const [mongo, storage, mailer] = await Promise.all([check(pingDb), check(pingStorage), check(pingMailer)]);
+  const [mongo, storage, mailer] = await Promise.all([
+    check(pingDb),
+    check(pingStorage),
+    check(pingMailer),
+  ]);
   const ok = mongo === 'ok' && storage === 'ok' && mailer === 'ok';
   return NextResponse.json(
     { status: ok ? 'ok' : 'degraded', services: { mongo, storage, mailer } },

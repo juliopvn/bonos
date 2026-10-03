@@ -17,7 +17,8 @@ export const toISODate = (d: Date): string => d.toISOString().slice(0, 10);
 export const startOfUtcDay = (d: Date): Date =>
   utcDate(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
 
-export const daysInMonth = (y: number, m: number): number => new Date(Date.UTC(y, m, 0)).getUTCDate();
+export const daysInMonth = (y: number, m: number): number =>
+  new Date(Date.UTC(y, m, 0)).getUTCDate();
 
 export const isEndOfMonth = (d: Date): boolean =>
   d.getUTCDate() === daysInMonth(d.getUTCFullYear(), d.getUTCMonth() + 1);
@@ -31,7 +32,8 @@ export function addMonths(d: Date, months: number, eom = false): Date {
   return utcDate(y, m, eom ? last : Math.min(d.getUTCDate(), last));
 }
 
-export const daysBetween = (a: Date, b: Date): number => Math.round((b.getTime() - a.getTime()) / MS_DAY);
+export const daysBetween = (a: Date, b: Date): number =>
+  Math.round((b.getTime() - a.getTime()) / MS_DAY);
 
 /** Días 30/360 (US/NASD simplificado). */
 export function days360(a: Date, b: Date): number {

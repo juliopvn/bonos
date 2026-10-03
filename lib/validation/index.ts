@@ -64,19 +64,34 @@ const bondBase = z.object({
 
 export const bondSchema = bondBase.superRefine((b, ctx) => {
   if (b.maturityDate <= b.issueDate) {
-    ctx.addIssue({ code: 'custom', path: ['maturityDate'], message: 'El vencimiento debe ser posterior a la emisión' });
+    ctx.addIssue({
+      code: 'custom',
+      path: ['maturityDate'],
+      message: 'El vencimiento debe ser posterior a la emisión',
+    });
   }
   if (b.couponType === 'fixed' && b.couponRateBps == null) {
     ctx.addIssue({ code: 'custom', path: ['couponRateBps'], message: 'Indica la tasa de cupón' });
   }
   if (b.couponType === 'floating' && (b.referenceRateBps == null || b.spreadBps == null)) {
-    ctx.addIssue({ code: 'custom', path: ['referenceRateBps'], message: 'Indica tasa de referencia y spread' });
+    ctx.addIssue({
+      code: 'custom',
+      path: ['referenceRateBps'],
+      message: 'Indica tasa de referencia y spread',
+    });
   }
 });
 
 export const previewSchema = bondBase.pick({
-  nominalCents: true, couponType: true, couponRateBps: true, referenceRateBps: true, spreadBps: true,
-  frequency: true, dayCount: true, issueDate: true, maturityDate: true,
+  nominalCents: true,
+  couponType: true,
+  couponRateBps: true,
+  referenceRateBps: true,
+  spreadBps: true,
+  frequency: true,
+  dayCount: true,
+  issueDate: true,
+  maturityDate: true,
 });
 
 export const orderSchema = z.object({
@@ -88,7 +103,10 @@ export const orderSchema = z.object({
 export const closeBookSchema = z.object({ finalPriceBps: priceBps });
 export const referenceRateSchema = z.object({ referenceRateBps: bps(0, 5_000) });
 export const marketPriceSchema = z.object({ priceBps });
-export const buySchema = z.object({ bondId: objectId, units: z.number().int().min(1).max(1_000_000) });
+export const buySchema = z.object({
+  bondId: objectId,
+  units: z.number().int().min(1).max(1_000_000),
+});
 
 export const covenantSchema = z.object({
   description: z.string().trim().min(3).max(300),

@@ -25,7 +25,12 @@ export function IssuerManager({ issuers }: { issuers: Issuer[] }) {
     setBusy(true);
     try {
       await api('/api/admin/issuers', {
-        body: { name: fd.get('name'), sector: fd.get('sector'), country: fd.get('country') || 'México', rating: fd.get('rating') },
+        body: {
+          name: fd.get('name'),
+          sector: fd.get('sector'),
+          country: fd.get('country') || 'México',
+          rating: fd.get('rating'),
+        },
       });
       toast('Emisor creado');
       form.reset();
@@ -41,7 +46,9 @@ export function IssuerManager({ issuers }: { issuers: Issuer[] }) {
     const rating = newRatings[issuer._id] ?? issuer.rating;
     if (rating === issuer.rating) return toast('Elige un rating distinto al actual', 'info');
     try {
-      const res = await api<{ alertsCreated: number }>(`/api/admin/issuers/${issuer._id}/rating`, { body: { rating } });
+      const res = await api<{ alertsCreated: number }>(`/api/admin/issuers/${issuer._id}/rating`, {
+        body: { rating },
+      });
       toast(`Rating actualizado a ${rating}. Alertas enviadas: ${res.alertsCreated}`);
       router.refresh();
     } catch (err) {
@@ -53,7 +60,9 @@ export function IssuerManager({ issuers }: { issuers: Issuer[] }) {
     <div className="grid gap-8 xl:grid-cols-[1fr_340px]">
       <section aria-label="Listado de emisores" className="rise-2 min-w-0">
         {issuers.length === 0 ? (
-          <Empty title="Aún no hay emisores">Crea el primero con el formulario para poder estructurar emisiones.</Empty>
+          <Empty title="Aún no hay emisores">
+            Crea el primero con el formulario para poder estructurar emisiones.
+          </Empty>
         ) : (
           <div className="card table-wrap">
             <table className="table" data-testid="issuers-table">
@@ -71,9 +80,14 @@ export function IssuerManager({ issuers }: { issuers: Issuer[] }) {
                   <tr key={i._id} data-testid={`issuer-row-${i.name}`}>
                     <td className="font-semibold">{i.name}</td>
                     <td>{i.sector}</td>
-                    <td><RatingBadge rating={i.rating} /></td>
+                    <td>
+                      <RatingBadge rating={i.rating} />
+                    </td>
                     <td className="hint">
-                      {i.ratingHistory.slice(-3).map((h) => `${h.rating} (${formatDate(h.date)})`).join(' → ')}
+                      {i.ratingHistory
+                        .slice(-3)
+                        .map((h) => `${h.rating} (${formatDate(h.date)})`)
+                        .join(' → ')}
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
@@ -81,12 +95,21 @@ export function IssuerManager({ issuers }: { issuers: Issuer[] }) {
                           aria-label={`Nuevo rating de ${i.name}`}
                           className="input !min-h-8 !w-24 !py-1"
                           value={newRatings[i._id] ?? i.rating}
-                          onChange={(e) => setNewRatings({ ...newRatings, [i._id]: e.target.value })}
+                          onChange={(e) =>
+                            setNewRatings({ ...newRatings, [i._id]: e.target.value })
+                          }
                           data-testid={`rating-select-${i.name}`}
                         >
-                          {RATING_SCALE.map((r) => (<option key={r}>{r}</option>))}
+                          {RATING_SCALE.map((r) => (
+                            <option key={r}>{r}</option>
+                          ))}
                         </select>
-                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => changeRating(i)} data-testid={`rating-save-${i.name}`}>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => changeRating(i)}
+                          data-testid={`rating-save-${i.name}`}
+                        >
                           Guardar
                         </button>
                       </div>
@@ -101,22 +124,57 @@ export function IssuerManager({ issuers }: { issuers: Issuer[] }) {
 
       <section aria-labelledby="new-issuer" className="rise-3">
         <form onSubmit={create} className="card card-pad space-y-4" data-testid="issuer-form">
-          <h2 id="new-issuer" className="display text-2xl">Nuevo emisor</h2>
+          <h2 id="new-issuer" className="display text-2xl">
+            Nuevo emisor
+          </h2>
           <div className="field">
-            <label htmlFor="name" className="label">Razón social</label>
-            <input id="name" name="name" required minLength={2} className="input" data-testid="issuer-name" />
+            <label htmlFor="name" className="label">
+              Razón social
+            </label>
+            <input
+              id="name"
+              name="name"
+              required
+              minLength={2}
+              className="input"
+              data-testid="issuer-name"
+            />
           </div>
           <div className="field">
-            <label htmlFor="sector" className="label">Sector</label>
-            <input id="sector" name="sector" required minLength={2} className="input" data-testid="issuer-sector" list="sectors" />
+            <label htmlFor="sector" className="label">
+              Sector
+            </label>
+            <input
+              id="sector"
+              name="sector"
+              required
+              minLength={2}
+              className="input"
+              data-testid="issuer-sector"
+              list="sectors"
+            />
             <datalist id="sectors">
-              {['Energía', 'Financiero', 'Consumo', 'Telecomunicaciones', 'Infraestructura'].map((s) => (<option key={s} value={s} />))}
+              {['Energía', 'Financiero', 'Consumo', 'Telecomunicaciones', 'Infraestructura'].map(
+                (s) => (
+                  <option key={s} value={s} />
+                ),
+              )}
             </datalist>
           </div>
           <div className="field">
-            <label htmlFor="rating" className="label">Rating inicial</label>
-            <select id="rating" name="rating" defaultValue="A" className="input" data-testid="issuer-rating">
-              {RATING_SCALE.map((r) => (<option key={r}>{r}</option>))}
+            <label htmlFor="rating" className="label">
+              Rating inicial
+            </label>
+            <select
+              id="rating"
+              name="rating"
+              defaultValue="A"
+              className="input"
+              data-testid="issuer-rating"
+            >
+              {RATING_SCALE.map((r) => (
+                <option key={r}>{r}</option>
+              ))}
             </select>
           </div>
           <button className="btn btn-primary w-full" disabled={busy} data-testid="issuer-submit">

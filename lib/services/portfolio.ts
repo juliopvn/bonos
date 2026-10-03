@@ -13,7 +13,14 @@ export async function getHoldings(investorId: ObjectId): Promise<Holding[]> {
       { $match: { investorId, units: { $gt: 0 } } },
       { $lookup: { from: 'bonds', localField: 'bondId', foreignField: '_id', as: 'bond' } },
       { $unwind: '$bond' },
-      { $lookup: { from: 'issuers', localField: 'bond.issuerId', foreignField: '_id', as: 'issuer' } },
+      {
+        $lookup: {
+          from: 'issuers',
+          localField: 'bond.issuerId',
+          foreignField: '_id',
+          as: 'issuer',
+        },
+      },
       { $unwind: '$issuer' },
       { $sort: { acquiredAt: -1 } },
     ])
@@ -40,7 +47,12 @@ export async function getPerformance(
 ): Promise<PerformancePoint[]> {
   if (holdings.length === 0) return [];
   const bondIds = holdings.map((h) => h.bondId);
-  const history = await (await col('priceHistory')).find({ bondId: { $in: bondIds } }).sort({ date: 1 }).toArray();
+  const history = await (
+    await col('priceHistory')
+  )
+    .find({ bondId: { $in: bondIds } })
+    .sort({ date: 1 })
+    .toArray();
   const dates = [...new Set(history.map((h) => toISODate(h.date)))].sort();
   const byBond = new Map<string, { date: string; priceBps: number }[]>();
   for (const h of history) {
@@ -55,7 +67,9 @@ export async function getPerformance(
       const last = [...series].reverse().find((s) => s.date <= date);
       if (last) parts.push(marketValueCents(h.units, h.bond.nominalCents, last.priceBps));
     }
-    const collected = sumCents(paid.filter((p) => p.paidAt && toISODate(p.paidAt) <= date).map((p) => p.amountCents));
+    const collected = sumCents(
+      paid.filter((p) => p.paidAt && toISODate(p.paidAt) <= date).map((p) => p.amountCents),
+    );
     const value = sumCents(parts);
     return { date, valueCents: value, collectedCents: collected, totalCents: value + collected };
   });
@@ -63,7 +77,12 @@ export async function getPerformance(
 
 export async function getPortfolio(investorId: ObjectId, asOf: Date = new Date()) {
   const holdings = await getHoldings(investorId);
-  const payments = await (await col('scheduledPayments')).find({ investorId }).sort({ dueDate: 1 }).toArray();
+  const payments = await (
+    await col('scheduledPayments')
+  )
+    .find({ investorId })
+    .sort({ dueDate: 1 })
+    .toArray();
   const paid = payments.filter((p) => p.status === 'paid');
   const upcoming = payments.filter((p) => p.status === 'scheduled' && p.dueDate >= startOf(asOf));
   const overdue = payments.filter((p) => p.status === 'scheduled' && p.dueDate < startOf(asOf));
@@ -81,7 +100,11 @@ export async function getPortfolio(investorId: ObjectId, asOf: Date = new Date()
   const cost = sumCents(rows.map((r) => r.costCents));
   const pnl = marketValue - cost;
   const dist = (keyOf: (h: Holding) => string) =>
-    distribution(rows, (r) => keyOf(r.holding), (r) => r.marketValueCents);
+    distribution(
+      rows,
+      (r) => keyOf(r.holding),
+      (r) => r.marketValueCents,
+    );
 
   const upcomingWithBond = upcoming.slice(0, 12).map((p) => ({
     ...p,
@@ -104,4 +127,5 @@ export async function getPortfolio(investorId: ObjectId, asOf: Date = new Date()
   };
 }
 
-const startOf = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+const startOf = (d: Date) =>
+  new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));

@@ -11,9 +11,11 @@ export const formatDateTime = (d: Date | string): string => {
   return `${formatDate(date)} ${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
 };
 
-export const isoDay = (d: Date | string): string => (typeof d === 'string' ? d : d.toISOString()).slice(0, 10);
+export const isoDay = (d: Date | string): string =>
+  (typeof d === 'string' ? d : d.toISOString()).slice(0, 10);
 
 /** Cobertura ×100 → "2.5×". */
 export const formatCoverage = (x100: number): string => `${(x100 / 100).toFixed(2)}×`;
 
-export const signed = (cents: number): 'pos' | 'neg' | undefined => (cents > 0 ? 'pos' : cents < 0 ? 'neg' : undefined);
+export const signed = (cents: number): 'pos' | 'neg' | undefined =>
+  cents > 0 ? 'pos' : cents < 0 ? 'neg' : undefined;

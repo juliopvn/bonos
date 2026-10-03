@@ -33,7 +33,15 @@ export async function uploadDocument(
   const bond = await (await col('bonds')).findOne({ _id: input.bondId });
   if (!bond) throw notFound('Bono');
   const body = Buffer.from(await file.arrayBuffer());
-  return storeDocument(actorId, bond._id, bond.issuerId, input.kind, safeName(file.name), file.type, body);
+  return storeDocument(
+    actorId,
+    bond._id,
+    bond.issuerId,
+    input.kind,
+    safeName(file.name),
+    file.type,
+    body,
+  );
 }
 
 export async function storeDocument(
@@ -60,7 +68,11 @@ export async function storeDocument(
     createdAt: new Date(),
   };
   await (await col('documents')).insertOne(doc);
-  await audit(actorId, 'document.upload', 'document', doc._id, { bondId: bondId.toHexString(), kind, fileName });
+  await audit(actorId, 'document.upload', 'document', doc._id, {
+    bondId: bondId.toHexString(),
+    kind,
+    fileName,
+  });
   return doc;
 }
 
@@ -70,7 +82,9 @@ export async function listDocuments(bondId: ObjectId): Promise<DocumentDoc[]> {
 
 /** Documentos de los bonos que el inversor posee. */
 export async function listDocumentsForInvestor(investorId: ObjectId) {
-  const bondIds = await (await col('positions')).distinct('bondId', { investorId, units: { $gt: 0 } });
+  const bondIds = await (
+    await col('positions')
+  ).distinct('bondId', { investorId, units: { $gt: 0 } });
   return (await col('documents'))
     .aggregate<DocumentDoc & { bond: { name: string; code: string } }>([
       { $match: { bondId: { $in: bondIds } } },
@@ -90,7 +104,13 @@ export async function authorizedDownloadUrl(
   if (!doc) throw notFound('Documento');
   if (user.role !== 'admin') {
     const holds = doc.bondId
-      ? await (await col('positions')).countDocuments({ investorId: new ObjectId(user.id), bondId: doc.bondId, units: { $gt: 0 } })
+      ? await (
+          await col('positions')
+        ).countDocuments({
+          investorId: new ObjectId(user.id),
+          bondId: doc.bondId,
+          units: { $gt: 0 },
+        })
       : 0;
     if (!holds) throw forbidden();
   }

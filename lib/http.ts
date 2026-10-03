@@ -11,9 +11,12 @@ export class HttpError extends Error {
   }
 }
 
-export const unauthorized = () => new HttpError(401, 'Inicia sesión para continuar', 'unauthorized');
-export const forbidden = () => new HttpError(403, 'No tienes permiso para esta acción', 'forbidden');
-export const notFound = (what = 'Recurso') => new HttpError(404, `${what} no encontrado`, 'not_found');
+export const unauthorized = () =>
+  new HttpError(401, 'Inicia sesión para continuar', 'unauthorized');
+export const forbidden = () =>
+  new HttpError(403, 'No tienes permiso para esta acción', 'forbidden');
+export const notFound = (what = 'Recurso') =>
+  new HttpError(404, `${what} no encontrado`, 'not_found');
 export const conflict = (msg: string) => new HttpError(409, msg, 'conflict');
 export const badRequest = (msg: string) => new HttpError(400, msg, 'bad_request');
 

@@ -44,7 +44,11 @@ export async function createAlert(
     try {
       await sendMail({
         to: user.email,
-        ...alertEmail({ title: payload.title, detail: payload.detail, link: `${getEnv().APP_BASE_URL}/investor/alerts` }),
+        ...alertEmail({
+          title: payload.title,
+          detail: payload.detail,
+          link: `${getEnv().APP_BASE_URL}/investor/alerts`,
+        }),
       });
       await alerts.updateOne({ _id: doc._id }, { $set: { emailedAt: new Date() } });
     } catch (e) {
@@ -57,7 +61,10 @@ export async function createAlert(
 /** Inversores con posición vigente en algún bono de la lista. */
 async function holdersOf(bondIds: ObjectId[]): Promise<ObjectId[]> {
   if (bondIds.length === 0) return [];
-  return (await col('positions')).distinct('investorId', { bondId: { $in: bondIds }, units: { $gt: 0 } });
+  return (await col('positions')).distinct('investorId', {
+    bondId: { $in: bondIds },
+    units: { $gt: 0 },
+  });
 }
 
 async function notifyRatingEntry(issuer: IssuerDoc, index: number): Promise<number> {
@@ -88,7 +95,9 @@ async function notifyRatingEntry(issuer: IssuerDoc, index: number): Promise<numb
 /** Alertas por cambios de rating recientes (ventana de 7 días). Idempotente. */
 export async function evaluateRatings(asOf: Date, issuerId?: ObjectId): Promise<number> {
   const since = addDays(asOf, -7);
-  const issuers = await (await col('issuers'))
+  const issuers = await (
+    await col('issuers')
+  )
     .find(issuerId ? { _id: issuerId } : { 'ratingHistory.date': { $gte: since } })
     .toArray();
   let created = 0;
@@ -102,7 +111,9 @@ export async function evaluateRatings(asOf: Date, issuerId?: ObjectId): Promise<
 
 /** Alertas por variación de precio entre las dos últimas cotizaciones, según umbral de cada usuario. */
 export async function evaluatePriceMoves(asOf: Date, bondId?: ObjectId): Promise<number> {
-  const bonds = await (await col('bonds'))
+  const bonds = await (
+    await col('bonds')
+  )
     .find(bondId ? { _id: bondId } : { status: 'active' })
     .toArray();
   const history = await col('priceHistory');
@@ -116,7 +127,8 @@ export async function evaluatePriceMoves(asOf: Date, bondId?: ObjectId): Promise
     if (!latest || !prev) continue;
     for (const investorId of await holdersOf([bond._id])) {
       const user = await findUserById(investorId);
-      if (!user || !exceedsPriceMove(prev.priceBps, latest.priceBps, user.alertPrefs.priceMoveBps)) continue;
+      if (!user || !exceedsPriceMove(prev.priceBps, latest.priceBps, user.alertPrefs.priceMoveBps))
+        continue;
       const up = latest.priceBps > prev.priceBps;
       const ok = await createAlert(
         investorId,
@@ -145,11 +157,22 @@ export async function evaluateRebalance(asOf: Date): Promise<number> {
     const user = await findUserById(investorId);
     if (!user) continue;
     const held = await positions
-      .aggregate<{ units: number; bond: { nominalCents: number; marketPriceBps: number | null; term: string }; issuer: { name: string; sector: string } }>([
+      .aggregate<{
+        units: number;
+        bond: { nominalCents: number; marketPriceBps: number | null; term: string };
+        issuer: { name: string; sector: string };
+      }>([
         { $match: { investorId, units: { $gt: 0 } } },
         { $lookup: { from: 'bonds', localField: 'bondId', foreignField: '_id', as: 'bond' } },
         { $unwind: '$bond' },
-        { $lookup: { from: 'issuers', localField: 'bond.issuerId', foreignField: '_id', as: 'issuer' } },
+        {
+          $lookup: {
+            from: 'issuers',
+            localField: 'bond.issuerId',
+            foreignField: '_id',
+            as: 'issuer',
+          },
+        },
         { $unwind: '$issuer' },
       ])
       .toArray();

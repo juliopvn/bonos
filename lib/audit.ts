@@ -8,7 +8,9 @@ export async function audit(
   entityId: ObjectId | string,
   diff: Record<string, unknown> = {},
 ): Promise<void> {
-  await (await col('auditLog')).insertOne({
+  await (
+    await col('auditLog')
+  ).insertOne({
     actorId,
     action,
     entity,

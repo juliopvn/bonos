@@ -19,7 +19,8 @@ export async function placeOrder(
   input: { bondId: ObjectId; units: number; limitPriceBps: number },
 ): Promise<OrderDoc> {
   const bond = await getBond(input.bondId);
-  if (bond.status !== 'bookbuilding') throw conflict('El libro de órdenes de esta emisión no está abierto');
+  if (bond.status !== 'bookbuilding')
+    throw conflict('El libro de órdenes de esta emisión no está abierto');
   const doc: OrderDoc = {
     _id: new ObjectId(),
     bondId: bond._id,
@@ -55,7 +56,9 @@ const toBookOrder = (o: OrderDoc): BookOrder => ({
 /** Libro en vivo: demanda agregada + órdenes pendientes con el correo del inversor. */
 export async function getBook(bondId: ObjectId) {
   const bond = await getBond(bondId);
-  const orders = await (await col('orders'))
+  const orders = await (
+    await col('orders')
+  )
     .aggregate<OrderDoc & { investor: { email: string } }>([
       { $match: { bondId, status: 'pending' } },
       { $lookup: { from: 'users', localField: 'investorId', foreignField: '_id', as: 'investor' } },
@@ -108,7 +111,10 @@ export async function closeAndAllocate(actorId: ObjectId, bondId: ObjectId, fina
       const allocations = allocate(orders.map(toBookOrder), finalPriceBps, bond.totalUnits);
       const byId = new Map(allocations.map((a) => [a.id, a]));
 
-      const byInvestor = new Map<string, { investorId: ObjectId; allocated: number; requested: number }>();
+      const byInvestor = new Map<
+        string,
+        { investorId: ObjectId; allocated: number; requested: number }
+      >();
       for (const o of orders) {
         const a = byId.get(o._id.toHexString())!;
         await ordersCol.updateOne(

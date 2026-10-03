@@ -16,8 +16,8 @@ export default function LoginPage() {
           en su fecha.
         </h1>
         <p className="muted mt-5 max-w-md text-lg">
-          Estructura emisiones, abre el libro de órdenes y cobra el principal al vencimiento. O compra
-          bonos, y mira tu cartera trabajar.
+          Estructura emisiones, abre el libro de órdenes y cobra el principal al vencimiento. O
+          compra bonos, y mira tu cartera trabajar.
         </p>
 
         <figure className="certificate rise-2 mt-10 max-w-xl p-8" aria-label="Ejemplo de título">
@@ -56,7 +56,12 @@ export default function LoginPage() {
               <p className="hint mt-6 border-t border-dashed border-line pt-4">
                 Demo local: <span className="num">admin@demo.local</span> ·{' '}
                 <span className="num">investor1@demo.local</span>. Los correos llegan a{' '}
-                <a className="underline" href="http://localhost:8025" target="_blank" rel="noreferrer">
+                <a
+                  className="underline"
+                  href="http://localhost:8025"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   MailHog
                 </a>
                 .

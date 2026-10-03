@@ -10,7 +10,12 @@ export const dynamic = 'force-dynamic';
 /** Solo el propio inversor ve sus órdenes. */
 export const GET = route(async () => {
   const s = await requireRole('investor');
-  const items = await (await col('orders')).find({ investorId: new ObjectId(s.sub) }).sort({ createdAt: -1 }).toArray();
+  const items = await (
+    await col('orders')
+  )
+    .find({ investorId: new ObjectId(s.sub) })
+    .sort({ createdAt: -1 })
+    .toArray();
   return ok({ items });
 });
 

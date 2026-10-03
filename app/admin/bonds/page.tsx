@@ -16,27 +16,51 @@ export default async function BondsPage() {
   return (
     <>
       <PageHeader eyebrow="Estructuración" title="Emisiones">
-        <Link href="/admin/bonds/new" className="btn btn-primary" data-testid="new-bond">Nueva emisión</Link>
+        <Link href="/admin/bonds/new" className="btn btn-primary" data-testid="new-bond">
+          Nueva emisión
+        </Link>
       </PageHeader>
       {bonds.length === 0 ? (
-        <Empty title="Aún no hay emisiones">Estructura la primera: nominal, cupón, frecuencia y vencimiento.</Empty>
+        <Empty title="Aún no hay emisiones">
+          Estructura la primera: nominal, cupón, frecuencia y vencimiento.
+        </Empty>
       ) : (
         <div className="card table-wrap rise-2">
           <table className="table" data-testid="bonds-table">
             <thead>
-              <tr><th>Emisión</th><th>Emisor</th><th>Estado</th><th className="r">Nominal</th><th className="r">Cupón</th><th>Frecuencia</th><th>Plazo</th><th>Vence</th></tr>
+              <tr>
+                <th>Emisión</th>
+                <th>Emisor</th>
+                <th>Estado</th>
+                <th className="r">Nominal</th>
+                <th className="r">Cupón</th>
+                <th>Frecuencia</th>
+                <th>Plazo</th>
+                <th>Vence</th>
+              </tr>
             </thead>
             <tbody>
               {bonds.map((b) => (
                 <tr key={b._id.toHexString()}>
                   <td>
-                    <Link href={`/admin/bonds/${b._id}`} className="font-semibold underline decoration-gilt underline-offset-4" data-testid={`bond-link-${b.code}`}>{b.name}</Link>
+                    <Link
+                      href={`/admin/bonds/${b._id}`}
+                      className="font-semibold underline decoration-gilt underline-offset-4"
+                      data-testid={`bond-link-${b.code}`}
+                    >
+                      {b.name}
+                    </Link>
                     <div className="hint num">{b.code}</div>
                   </td>
                   <td>{b.issuer.name}</td>
-                  <td><BondStatusBadge status={b.status} /></td>
+                  <td>
+                    <BondStatusBadge status={b.status} />
+                  </td>
                   <td className="num r">{formatMoney(b.nominalCents)}</td>
-                  <td className="num r">{formatBps(effectiveRateBps(b))}{b.couponType === 'floating' && <span className="hint"> var.</span>}</td>
+                  <td className="num r">
+                    {formatBps(effectiveRateBps(b))}
+                    {b.couponType === 'floating' && <span className="hint"> var.</span>}
+                  </td>
                   <td>{FREQUENCY_LABEL[b.frequency]}</td>
                   <td>{TERM_LABEL[b.term]}</td>
                   <td className="num">{formatDate(b.maturityDate)}</td>

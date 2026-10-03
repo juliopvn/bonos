@@ -5,7 +5,11 @@ import type { AlertPrefs, Role, UserDoc } from '../types';
 
 export function defaultAlertPrefs(): AlertPrefs {
   const env = getEnv();
-  return { priceMoveBps: env.ALERT_PRICE_MOVE_BPS, concentrationPct: env.ALERT_CONCENTRATION_PCT, email: true };
+  return {
+    priceMoveBps: env.ALERT_PRICE_MOVE_BPS,
+    concentrationPct: env.ALERT_CONCENTRATION_PCT,
+    email: true,
+  };
 }
 
 export async function findUserByEmail(email: string): Promise<UserDoc | null> {

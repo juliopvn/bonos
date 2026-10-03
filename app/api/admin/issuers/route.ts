@@ -16,6 +16,9 @@ export const POST = route(async (req) => {
   const s = await requireRole('admin');
   const input = issuerSchema.parse(await readJson(req));
   const issuer = await createIssuer(input);
-  await audit(new ObjectId(s.sub), 'issuer.create', 'issuer', issuer._id, { name: issuer.name, rating: issuer.rating });
+  await audit(new ObjectId(s.sub), 'issuer.create', 'issuer', issuer._id, {
+    name: issuer.name,
+    rating: issuer.rating,
+  });
   return ok(issuer, { status: 201 });
 });
