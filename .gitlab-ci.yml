@@ -1,53 +1,51 @@
-# Paso 1 (diagnóstico): solo informa sobre el runner real. Ver docs/ci-notes.md.
+# CI de GitLab — se construye por etapas según lo que muestra el runner real (docs/ci-notes.md).
+# El runner online (cloudrun-ephemeral) exige el tag `cloudrun`, ignora `image:` (Node 22 / Ubuntu 24.04),
+# no tiene Docker ni `services:` y sí tiene salida a internet.
 workflow:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-stages: [diagnose]
-
-# El runner online (cloudrun-ephemeral) no ejecuta jobs sin etiqueta (run_untagged=false).
 default:
   tags: [cloudrun]
+  interruptible: true
 
+stages: [diagnose, quality]
+
+variables:
+  GIT_DEPTH: "20"
+  PNPM_STORE: "$CI_PROJECT_DIR/.pnpm-store"
+  MONGOMS_DOWNLOAD_DIR: "$CI_PROJECT_DIR/.cache/mongodb-binaries"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+.node:
+  image: node:24-bookworm
+  cache:
+    key:
+      files: [pnpm-lock.yaml]
+    paths:
+      - .pnpm-store
+      - .cache/mongodb-binaries
+  before_script:
+    - node -v
+    - npm install -g pnpm@12.8.1
+    - pnpm config set store-dir "$PNPM_STORE"
+    - pnpm install --frozen-lockfile
+
+# ── Etapa 1: calidad ───────────────────────────────────────────
+quality:
+  extends: .node
+  stage: quality
+  script:
+    - pnpm lint
+    - pnpm typecheck
+
+# ── Diagnóstico del runner (manual) ────────────────────────────
 diagnose:
   stage: diagnose
-  image: node:24-bookworm
-  interruptible: true
-  script:
-    - |
-      echo "== runner"
-      echo "desc=$CI_RUNNER_DESCRIPTION tags=$CI_RUNNER_TAGS arch=$CI_RUNNER_EXECUTABLE_ARCH server=$CI_SERVER_VERSION"
-      uname -a || true
-      cat /etc/os-release || true
-      echo "== recursos"
-      nproc || true
-      (free -m || head -3 /proc/meminfo) || true
-      df -h || true
-      df -h /dev/shm || true
-      echo "== herramientas"
-      node -v || true
-      (corepack --version || true)
-      (pnpm -v || true)
-      git --version || true
-      (docker version || echo "docker no disponible")
-      (docker info 2>&1 | head -5 || true)
-      echo "== red"
-      for u in https://registry.npmjs.org https://fastdl.mongodb.org https://cdn.playwright.dev https://playwright.azureedge.net https://mcr.microsoft.com https://registry-1.docker.io; do
-        printf "%s -> " "$u"; curl -sSI --max-time 10 "$u" | head -1 || echo FALLO
-      done
-      env | grep -i proxy || echo "sin proxy"
-  allow_failure: false
-
-diagnose:services:
-  stage: diagnose
-  image: node:24-bookworm
-  interruptible: true
-  services:
-    - name: mongo:7
-      alias: mongo
-      command: ["--replSet", "rs0", "--bind_ip_all"]
-  script:
-    - |
-      echo "Probando conexión a mongo:27017 (puede fallar; es información)"
-      node -e "const net=require('net');const s=net.connect(27017,'mongo');s.on('connect',()=>{console.log('mongo: puerto abierto');process.exit(0)});s.on('error',e=>{console.log('mongo: FALLO',e.message);process.exit(1)});setTimeout(()=>{console.log('timeout');process.exit(1)},20000)"
+  when: manual
   allow_failure: true
+  script:
+    - |
+      echo "desc=$CI_RUNNER_DESCRIPTION tags=$CI_RUNNER_TAGS"
+      node -v; nproc; free -m; df -h /dev/shm
+      (docker version || echo "docker no disponible")
