@@ -5,6 +5,10 @@ workflow:
 
 stages: [diagnose]
 
+# El runner online (cloudrun-ephemeral) no ejecuta jobs sin etiqueta (run_untagged=false).
+default:
+  tags: [cloudrun]
+
 diagnose:
   stage: diagnose
   image: node:24-bookworm
