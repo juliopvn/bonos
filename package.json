@@ -23,6 +23,7 @@
     "jobs:run": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/jobs.ts",
     "services:up": "docker compose up -d --wait mongo mailhog rustfs && docker compose run --rm rustfs-init",
     "services:down": "docker compose down",
+    "bench": "tsx --env-file-if-exists=.env.local scripts/bench-decisions.ts",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm services:up && pnpm test:e2e"
   },
   "dependencies": {
