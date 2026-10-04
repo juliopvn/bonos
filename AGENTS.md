@@ -132,3 +132,18 @@ El CI vivirá en **GitLab** (`.gitlab-ci.yml`) y se ajustará iterativamente al 
 - No ejecutar seeds destructivos contra producción (`seed:reset` está prohibido con el perfil `demo`; `demo` exige `ALLOW_SEED=true`).
 - No usar `number` decimal para dinero ni redondear fuera de `lib/money.ts`.
 - No confiar en `proxy.ts` ni en el cliente para autorizar.
+
+## 11. Seed de producción
+
+Cuando el usuario diga **"crea seeds de datos en PROD"**, ejecuta este procedimiento, en orden. **Nunca pidas que se peguen secretos en el chat.**
+
+1. **Verifica `.env.production.local`** (no versionado: `.env.*` está en `.gitignore`). Cárgalo con `set -a; source .env.production.local; set +a`. Si el archivo no existe o falta alguna de estas variables, **detente y di cuáles faltan** (solo sus nombres, jamás sus valores): `MONGODB_URI`, `MONGODB_DB`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `SEED_DEMO_INVESTORS` (también `AUTH_SECRET` y `CRON_SECRET`, que `lib/env.ts` exige al arrancar). Para comprobarlo sin imprimir valores: `for v in MONGODB_URI MONGODB_DB S3_ENDPOINT S3_BUCKET S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY SEED_DEMO_INVESTORS AUTH_SECRET CRON_SECRET; do [ -n "${!v}" ] || echo "falta $v"; done` (en zsh: `${(P)v}`).
+2. **Confirma el destino antes de escribir nada**: `MONGODB_DB` debe ser exactamente `bonos` (la base de producción en Atlas; nunca `bonos_preview` ni `bonds`). Muestra al usuario solo el **host** de Atlas (la parte entre `@` y `/`, sin usuario ni contraseña) y la base, y **espera su confirmación**. El seed también imprime `destino: <host> / base <db>` al arrancar.
+3. **Ejecuta** `ALLOW_SEED=true SEED_PROFILE=demo pnpm seed`.
+   - **Nunca** `pnpm seed:reset` ni borrar colecciones en producción (el script lo rechaza con el perfil `demo`).
+   - Es idempotente: si los bonos demo ya existen no duplica nada (`creados` sale en 0).
+   - Los inversores salen de `SEED_DEMO_INVESTORS` (emails separados por coma, máx. 10). **No crea admin**: el real viene de `ADMIN_EMAILS` y se crea al primer login.
+   - Necesita `S3_*` válidos (sube documentos de ejemplo al bucket de producción).
+4. **Reporta** lo que imprime el seed: filas `creados` de `issuers`, `bonds`, `positions` y `documents` (y users, orders, scheduledPayments, alerts), y la línea `inversores demo` con los emails con los que se puede entrar. El acceso es por magic link (Resend) a esos correos.
+
+Si el seed falla a medias, no lo repitas a ciegas: los bonos que ya existan se omiten y puede quedar una cartera incompleta; informa al usuario y propón una limpieza dirigida (nunca un `reset`).

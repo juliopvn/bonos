@@ -12,10 +12,10 @@ default:
 stages: [diagnose, quality, test, build, e2e, smoke]
 
 variables:
-  GIT_DEPTH: "20"
-  PNPM_STORE: "$CI_PROJECT_DIR/.pnpm-store"
-  MONGOMS_DOWNLOAD_DIR: "$CI_PROJECT_DIR/.cache/mongodb-binaries"
-  NEXT_TELEMETRY_DISABLED: "1"
+  GIT_DEPTH: '20'
+  PNPM_STORE: '$CI_PROJECT_DIR/.pnpm-store'
+  MONGOMS_DOWNLOAD_DIR: '$CI_PROJECT_DIR/.cache/mongodb-binaries'
+  NEXT_TELEMETRY_DISABLED: '1'
 
 .node:
   image: node:24-bookworm
@@ -74,7 +74,7 @@ e2e:
   variables:
     E2E_MAILBOX: memory
     E2E_MONGO: memory
-    PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
+    PLAYWRIGHT_BROWSERS_PATH: '$CI_PROJECT_DIR/.cache/ms-playwright'
   script:
     - pnpm exec playwright install --with-deps chromium
     - pnpm test:e2e
@@ -92,8 +92,8 @@ smoke:production:
   when: manual
   allow_failure: true
   variables:
-    BASE_URL: "https://bonos.jpavon-tech.com"
-    PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
+    BASE_URL: 'https://bonos.jpavon-tech.com'
+    PLAYWRIGHT_BROWSERS_PATH: '$CI_PROJECT_DIR/.cache/ms-playwright'
   script:
     - pnpm exec playwright install --with-deps chromium
     - pnpm test:smoke

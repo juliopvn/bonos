@@ -362,11 +362,24 @@ async function seedE2E() {
 }
 
 // ── Perfiles dev / demo: completo ────────────────────────────────────────────
-async function seedFull() {
-  const admin = await upsertUser('admin@demo.local', 'Admin Demo', 'admin');
+async function seedFull(profile: 'dev' | 'demo') {
   const investors: UserDoc[] = [];
-  for (let i = 1; i <= 4; i++)
-    investors.push(await upsertUser(`investor${i}@demo.local`, `Inversor ${i}`, 'investor'));
+  let adminId: ObjectId;
+  if (profile === 'demo') {
+    // Producción: no se crea admin (el real viene de ADMIN_EMAILS); los inversores salen de SEED_DEMO_INVESTORS.
+    const emails = getEnv().SEED_DEMO_INVESTORS;
+    if (emails.length === 0)
+      throw new Error('El perfil demo requiere SEED_DEMO_INVESTORS (emails separados por coma).');
+    for (const email of emails)
+      investors.push(await upsertUser(email, email.split('@')[0], 'investor'));
+    const existingAdmin = await (await col('users')).findOne({ role: 'admin' });
+    adminId = existingAdmin?._id ?? new ObjectId(); // autor de los documentos de ejemplo
+  } else {
+    adminId = (await upsertUser('admin@demo.local', 'Admin Demo', 'admin'))._id;
+    for (let i = 1; i <= 4; i++)
+      investors.push(await upsertUser(`investor${i}@demo.local`, `Inversor ${i}`, 'investor'));
+  }
+  const admin = { _id: adminId };
   const issuers: IssuerDoc[] = [];
   for (const [name, sector, rating] of ISSUERS)
     issuers.push(await upsertIssuer(name, sector, rating, true));
@@ -591,24 +604,38 @@ async function main() {
     await Promise.all(names.map((n) => db.collection(n).deleteMany({})));
     log(`base "${db.databaseName}" vaciada`);
   }
+  const target = new URL(env.MONGODB_URI.replace(/^mongodb(\+srv)?:/, 'http:'));
+  log(`destino: ${target.hostname} / base ${db.databaseName} (sin credenciales)`);
   log(`perfil ${profile} (${env.E2E_MODE ? 'E2E' : 'normal'})`);
-  if (profile === 'e2e') await seedE2E();
-  else await seedFull();
-  const counts = Object.fromEntries(
-    await Promise.all(
-      [
-        'users',
-        'issuers',
-        'bonds',
-        'positions',
-        'scheduledPayments',
-        'orders',
-        'alerts',
-        'documents',
-      ].map(async (n) => [n, await db.collection(n).countDocuments()]),
-    ),
+  const COLS = [
+    'users',
+    'issuers',
+    'bonds',
+    'positions',
+    'scheduledPayments',
+    'orders',
+    'alerts',
+    'documents',
+  ];
+  const before = Object.fromEntries(
+    await Promise.all(COLS.map(async (n) => [n, await db.collection(n).countDocuments()])),
   );
-  log(`listo ${JSON.stringify(counts)}`);
+  if (profile === 'e2e') await seedE2E();
+  else await seedFull(profile);
+  const after = Object.fromEntries(
+    await Promise.all(COLS.map(async (n) => [n, await db.collection(n).countDocuments()])),
+  );
+  const created = Object.fromEntries(COLS.map((n) => [n, after[n] - before[n]]));
+  log(`creados ${JSON.stringify(created)}`);
+  log(`totales ${JSON.stringify(after)}`);
+  if (profile === 'demo') {
+    const users = await (
+      await col('users')
+    )
+      .find({ email: { $in: env.SEED_DEMO_INVESTORS } })
+      .toArray();
+    log(`inversores demo: ${users.map((u) => u.email).join(', ')}`);
+  }
 }
 
 main()

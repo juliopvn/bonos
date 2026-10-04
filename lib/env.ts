@@ -57,6 +57,17 @@ const schema = z
 
     SEED_PROFILE: z.enum(['dev', 'e2e', 'demo']).default('dev'),
     ALLOW_SEED: bool('false'),
+    // Inversores del perfil demo (emails separados por coma). Solo se exige al sembrar con SEED_PROFILE=demo.
+    SEED_DEMO_INVESTORS: z
+      .string()
+      .default('')
+      .transform((v) =>
+        v
+          .split(',')
+          .map((e) => e.trim().toLowerCase())
+          .filter(Boolean),
+      )
+      .pipe(z.array(z.email('SEED_DEMO_INVESTORS contiene un correo inválido')).max(10)),
 
     BASE_URL: optional(z.string()), // solo E2E/smoke
     E2E_MODE: bool('false'),

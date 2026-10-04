@@ -63,6 +63,16 @@ describe('lib/env', () => {
     expect(getEnv().STORAGE_DRIVER).toBe('fs');
   });
 
+  it('SEED_DEMO_INVESTORS es opcional, se normaliza y valida', () => {
+    expect(getEnv().SEED_DEMO_INVESTORS).toEqual([]);
+    resetEnvCache();
+    process.env.SEED_DEMO_INVESTORS = ' A@x.com , b@y.org ';
+    expect(getEnv().SEED_DEMO_INVESTORS).toEqual(['a@x.com', 'b@y.org']);
+    resetEnvCache();
+    process.env.SEED_DEMO_INVESTORS = 'no-es-correo';
+    expect(() => getEnv()).toThrow(/SEED_DEMO_INVESTORS/);
+  });
+
   it('APP_URL cae a VERCEL_URL (previews) y ADMIN_EMAILS se normaliza', () => {
     process.env.VERCEL_URL = 'bonos-git-x.vercel.app';
     process.env.ADMIN_EMAILS = ' Admin@Demo.local , otro@x.com ';
